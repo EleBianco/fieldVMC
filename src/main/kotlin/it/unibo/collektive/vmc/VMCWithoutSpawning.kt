@@ -1,6 +1,6 @@
 package it.unibo.collektive.vmc
 
-import it.unibo.alchemist.collektive.device.DistanceSensor
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.alchemist.device.sensors.LeaderSensor

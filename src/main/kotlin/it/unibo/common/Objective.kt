@@ -12,7 +12,7 @@ import kotlin.math.absoluteValue
 /**
  * The goal for the optimization.
  */
-class Goal : (Environment<*, *>) -> Double {
+class Objective : (Environment<*, *>) -> Double {
     val metrics: List<String> =
         listOf(
             "nodes",
@@ -39,7 +39,7 @@ class Goal : (Environment<*, *>) -> Double {
  */
 fun target(
     experimentName: String,
-    metrics: List<String> = Goal().metrics,
+    metrics: List<String> = Objective().metrics,
 ): Map<String, Double> =
     retrieveData(
         listOf(experimentName),
@@ -74,7 +74,9 @@ fun Environment<*, *>.minimize(target: Map<String, Double>): Double =
                 val relative = current[metric] ?: error("Metric $metric not found")
                 // Add 1 to avoid values as 0
                 ((target - relative).absoluteValue + 1).also {
-                    require(it >= 1) { "The difference between target and current value should not be less than 1, but is $it" }
+                    require(it >= 1) {
+                        "The difference between target and current value should not be less than 1, but is $it"
+                    }
                 }
             }
         GeometricMean().evaluate(absoluteDifference.toDoubleArray())

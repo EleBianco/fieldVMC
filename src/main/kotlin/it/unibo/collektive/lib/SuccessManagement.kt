@@ -7,11 +7,12 @@ import it.unibo.collektive.coordination.convergeCast
 /**
  * Converge the success of the children nodes to itself.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.convergeSuccess(
+inline fun <reified ID> Aggregate<ID>.convergeSuccess(
     successSensor: SuccessSensor,
     potential: Double,
     localSuccess: Double,
-): Double = convergeCast(potential, localSuccess) { a, b -> a + b }.also { successSensor.setSuccess(it) }
+): Double where ID : Comparable<ID> =
+    convergeCast(potential, localSuccess) { a, b -> a + b }.also { successSensor.setSuccess(it) }
 
 /**
  * Get the local success of the node.

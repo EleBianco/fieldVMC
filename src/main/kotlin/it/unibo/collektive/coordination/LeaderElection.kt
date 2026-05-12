@@ -1,36 +1,35 @@
 package it.unibo.collektive.coordination
 
-import it.unibo.alchemist.collektive.device.DistanceSensor
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
+import it.unibo.collektive.stdlib.collapse.fold
 import java.io.Serializable
 
 /**
  * Elect the leader in an area limited by the [radius], based on the [localStrength] of the node.
  */
-fun <ID : Any, C : Comparable<C>> Aggregate<ID>.boundedElection(
+inline fun <reified ID : Any, reified C : Comparable<C>> Aggregate<ID>.boundedElection(
     distanceSensor: DistanceSensor,
     localStrength: C,
     radius: Double,
 ): ID {
-
     val local: Candidacy<ID, C> = Candidacy(localStrength, 0.0, localId)
     return share(local) { candidates ->
         val candidate =
             with(distanceSensor) {
-                candidates.alignedMap(distances()) { c, m -> Candidacy(c.strength, c.distance + m, c.leaderId) }
+                candidates.alignedMap(distances()) { _, c, m ->
+                    Candidacy(c.strength, c.distance + m, c.leaderId)
+                }
             }
-        val field: Field<ID, Candidacy<ID, C>?> =
-            candidate
-                .mapWithId { id, c -> c.takeUnless { id == localId || it.distance > radius } }
-        field.fold(local) { accumulator, newValue ->
-            when {
-                newValue == null -> accumulator
-                else -> minOf(accumulator, newValue)
+        candidate.neighbors
+            .fold(local) { accumulator, neighbor ->
+                val newValue = neighbor.value
+                when {
+                    newValue.distance > radius -> accumulator
+                    else -> minOf(accumulator, newValue)
+                }
             }
-        }
     }.leaderId
 }
 

@@ -14,7 +14,7 @@ constructor(
     filter: ExportFilter,
     aggregators: List<String>,
     precision: Int = 2,
-) : AbstractAggregatingDoubleExporter(filter, aggregators, precision) {
+) : AbstractAggregatingDoubleExtractor(filter, aggregators, precision) {
     private companion object {
         private const val NAME: String = "subnetworks-diameter"
         private operator fun Node<*>.get(name: String) = getConcentration(SimpleMolecule(name))

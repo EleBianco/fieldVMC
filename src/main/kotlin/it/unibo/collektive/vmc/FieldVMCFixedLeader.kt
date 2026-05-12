@@ -1,6 +1,5 @@
 package it.unibo.collektive.vmc
 
-import it.unibo.alchemist.collektive.device.DistanceSensor
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
@@ -8,12 +7,14 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.collektive.alchemist.device.sensors.SuccessSensor
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.coordination.findParent
-import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.lib.convergeSuccess
 import it.unibo.collektive.lib.findPotential
 import it.unibo.collektive.lib.obtainLocalSuccess
 import it.unibo.collektive.lib.spreadResource
+import it.unibo.collektive.stdlib.collapse.countMatching
 import it.unibo.collektive.utils.SpawnerNoStability
 import it.unibo.collektive.utils.determineSpawn
 
@@ -50,13 +51,11 @@ fun Aggregate<Int>.fixedRootStability(
         ) { devSpawn, locationS, potential: Double, localSuccess: Double, success: Double, localResource: Double ->
             val children = neighboring(findParent(potential))
             env["children-around"] = children
-            env["parent"] = children.localValue
-            val childrenCount =
-                children
-                    .fold(0) { acc, parent -> acc + if (parent == localId) 1 else 0 }
+            env["parent"] = children.local.value
+            val childrenCount = children.neighbors.countMatching { it.id == localId }
             env["children-count"] = childrenCount
             val neighbors = neighboring(locationS.coordinates())
-            val localPosition = neighbors.localValue
+            val localPosition = neighbors.local.value
             val neighborPositions = locationS.surroundings()
             determineSpawn(childrenCount, localResource, localPosition, neighborPositions, devSpawn, random, resourceS)
         }

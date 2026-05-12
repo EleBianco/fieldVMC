@@ -14,7 +14,7 @@ class NodeDegree
         aggregators: List<String>,
         private val checkChildren: Boolean = false,
         precision: Int = 2,
-    ) : AbstractAggregatingDoubleExporter(filter, aggregators, precision) {
+    ) : AbstractAggregatingDoubleExtractor(filter, aggregators, precision) {
         private companion object {
             private const val NAME = "nodes-degree"
         }

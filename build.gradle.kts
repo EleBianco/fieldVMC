@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.awt.GraphicsEnvironment
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -232,8 +232,8 @@ File(rootProject.rootDir.path + "/src/main/yaml")
         }
     }
 
-tasks.withType(KotlinCompile::class).all {
+tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
-        allWarningsAsErrors = false
+        allWarningsAsErrors.set(false)
     }
 }

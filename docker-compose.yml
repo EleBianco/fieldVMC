@@ -1,11 +1,10 @@
 services:
   self-construction-field-vmc-optimizer:
-    image: angelacortecchia/field-vmc-simulation:${VERSION:-latest}
     build:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfConstructionFieldVMCOptimizer
@@ -16,7 +15,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfConstructionClassicVMCBatch
@@ -27,7 +26,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfConstructionFieldVMCBatch
@@ -38,7 +37,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfHealingClassicVMCBatch
@@ -49,7 +48,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfHealingFieldVMCBatch
@@ -60,7 +59,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfIntegrationBatch
@@ -71,18 +70,18 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfDivisionBatch
-    
+
   self-optimization-batch:
     image: angelacortecchia/field-vmc-simulation:${VERSION:-latest}
     build:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=500
       - GRADLE_TASK=runSelfOptimizationBatch
@@ -93,11 +92,7 @@ services:
       context: .
       dockerfile: docker/simulationLauncher/Dockerfile
     volumes:
-      - angela.cortecchia-volume:/experiment/data
+      - ./data:/experiment/data
     environment:
       - MAX_SEED=100
       - GRADLE_TASK=runSelfOptimizationLeaderElectionBatch
-
-volumes:
-  angela.cortecchia-volume:
-    external: true

@@ -1,117 +1,42 @@
 package it.unibo.alchemist.collektive.device
 
-import com.esotericsoftware.kryo.Kryo
-import com.esotericsoftware.kryo.io.Output
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
-import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
-import it.unibo.alchemist.model.positions.Euclidean2DPosition
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-import it.unibo.collektive.coordination.Candidacy
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.utils.Stability
-import java.io.ByteArrayOutputStream
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 
 /**
  * Representation of a Collektive device in Alchemist.
  * [P] is the position type, the [environment] property represent the environment in which the device is located,
- * the [node] property represent a node in the environment, [retainMessagesFor] is the time for which messages
- * are retained.
+ * the [node] property represent a node in the environment.
  */
 class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
-    private val retainMessagesFor: Time? = null,
 ) : NodeProperty<Any?>,
-    Network<Int>,
     EnvironmentVariables,
     DistanceSensor where P : Position<P> {
-    private data class TimedMessage(
-        val receivedAt: Time,
-        val payload: InboundMessage<Int>,
-    )
-
-    /**
-     * The current time.
-     */
-    var currentTime: Time = Time.ZERO
-
     /**
      * The ID of the node.
      */
     val id = node.id
 
-    private val validMessages: MutableList<TimedMessage> = mutableListOf()
-
-    private fun receiveMessage(
-        time: Time,
-        message: InboundMessage<Int>,
-    ) {
-        validMessages += TimedMessage(time, message)
-    }
-
-    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
-        environment.getPosition(node).let { nodePosition ->
-            neighboringViaExchange(nodePosition).map { position -> nodePosition.distanceTo(position) }
+    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> {
+        val nodePosition = environment.getPosition(node)
+        return neighboring(nodePosition as Position<*>).map { neighborPosition ->
+            @Suppress("UNCHECKED_CAST")
+            nodePosition.distanceTo(neighborPosition.value as P)
         }
+    }
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
-        CollektiveDevice(environment, node, retainMessagesFor)
-
-    override fun read(): Collection<InboundMessage<Int>> =
-        when {
-            validMessages.isEmpty() -> emptyList()
-            retainMessagesFor == null ->
-                validMessages.map { it.payload }.also { validMessages.clear() }
-            else -> {
-                validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                validMessages.map { it.payload }
-            }
-        }
-
-    override fun write(message: OutboundMessage<Int>) {
-        val kryo = Kryo()
-        kryo.register(Euclidean2DPosition::class.java)
-        kryo.register(Euclidean2DPosition.javaClass)
-        kryo.register(DoubleArray::class.java)
-        kryo.register(Pair::class.java)
-        kryo.register(Candidacy::class.java)
-        kryo.register(Stability::class.java)
-        if (message.isNotEmpty()) {
-            val neighboringNodes = environment.getNeighborhood(node)
-            if (!neighboringNodes.isEmpty) {
-                val neighborhood =
-                    neighboringNodes.mapNotNull { node ->
-                        @Suppress("UNCHECKED_CAST")
-                        node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
-                    }
-                var acc = 0
-                neighborhood.forEach { neighbor ->
-                    val messageValues = message.messagesFor(neighbor.id)
-                    val buff = ByteArrayOutputStream()
-                    Output(buff).use {
-                        messageValues.forEach { (_, value) ->
-                            kryo.writeClassAndObject(it, value)
-                        }
-                    }
-                    acc += buff.size() + 32 * messageValues.size
-                    neighbor.receiveMessage(
-                        currentTime,
-                        InboundMessage(message.senderId, messageValues),
-                    )
-                }
-                node.setConcentration(SimpleMolecule("MessageSize"), acc)
-            }
-        }
-    }
+        CollektiveDevice(environment, node)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T

@@ -1,8 +1,7 @@
 package it.unibo.collektive.vmc
 
-import it.unibo.alchemist.collektive.device.DistanceSensor
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.alchemist.device.sensors.LeaderSensor
@@ -10,8 +9,8 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.collektive.alchemist.device.sensors.SuccessSensor
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.coordination.findParent
-import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.lib.convergeSuccess
 import it.unibo.collektive.lib.findPotential
 import it.unibo.collektive.lib.isLeader
@@ -20,6 +19,8 @@ import it.unibo.collektive.lib.spreadResource
 import it.unibo.collektive.utils.Spawner
 import it.unibo.collektive.utils.Stability
 import it.unibo.collektive.utils.determineStability
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.stdlib.collapse.countMatching
 
 /**
  * Entrypoint of the VMC algorithm, using spawning and destroying after stability policies.
@@ -64,13 +65,11 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
         ) { devSpawn, locationSensor, potential: Double, localSuccess: Double, success: Double, localResource: Double ->
             val children = neighboring(findParent(potential))
             env["children-around"] = children
-            env["parent"] = children.localValue
-            val childrenCount =
-                children
-                    .fold(0) { acc, parent -> acc + if (parent == localId) 1 else 0 }
+            env["parent"] = children.local.value
+            val childrenCount = children.neighbors.countMatching { it.value == localId}
             env["children-count"] = childrenCount
             val neighbors = neighboring(locationSensor.coordinates())
-            val localPosition = neighbors.localValue
+            val localPosition = neighbors.local.value
             val neighborPositions = locationSensor.surroundings()
             val now = devSpawn.currentTime()
             share(Stability()) { neighborhoodStability ->
@@ -83,7 +82,7 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
                             now to current
                         }
                     }.first
-                val localStability = neighborhoodStability.localValue
+                val localStability = neighborhoodStability.local.value
                 determineStability(
                     childrenCount,
                     localResource,
