@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.awt.GraphicsEnvironment
+import org.gradle.process.ExecOperations
+import org.gradle.internal.extensions.core.serviceOf
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -44,11 +46,12 @@ dependencies {
 
 // Heap size estimation for batches
 val maxHeap: Long? by project
+val execOps: ExecOperations = project.serviceOf<ExecOperations>()
 val heap: Long =
     maxHeap ?: if (System.getProperty("os.name").lowercase().contains("linux")) {
         ByteArrayOutputStream()
             .use { output ->
-                exec {
+                execOps.exec {
                     executable = "bash"
                     args = listOf("-c", "cat /proc/meminfo | grep MemAvailable | grep -o '[0-9]*'")
                     standardOutput = output
@@ -93,7 +96,7 @@ fun String.capitalizeString(): String =
     }
 
 /*
- * Scan the folder with the simulation files, and create a task for each one of them.
+ * Scan the folder with the simulation files and create a task for each one of them.
  */
 File(rootProject.rootDir.path + "/src/main/yaml")
     .listFiles()
