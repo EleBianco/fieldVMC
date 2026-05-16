@@ -14,22 +14,23 @@ inline fun <reified ID : Any, reified C : Comparable<C>> Aggregate<ID>.boundedEl
     localStrength: C,
     radius: Double,
 ): ID {
+
     val local: Candidacy<ID, C> = Candidacy(localStrength, 0.0, localId)
     return share(local) { candidates ->
         val candidate =
             with(distanceSensor) {
-                candidates.alignedMap(distances()) { _, c, m ->
-                    Candidacy(c.strength, c.distance + m, c.leaderId)
-                }
+                candidates.alignedMap(distances()) { _, c, m -> Candidacy(c.strength,
+                    c.distance + m, c.leaderId) }
             }
         candidate.neighbors
             .fold(local) { accumulator, neighbor ->
                 val newValue = neighbor.value
+                val id = neighbor.id
                 when {
-                    newValue.distance > radius -> accumulator
+                    (newValue.distance > radius || id == localId) -> accumulator
                     else -> minOf(accumulator, newValue)
-                }
             }
+        }
     }.leaderId
 }
 

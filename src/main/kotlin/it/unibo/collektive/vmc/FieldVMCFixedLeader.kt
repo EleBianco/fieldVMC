@@ -52,7 +52,7 @@ fun Aggregate<Int>.fixedRootStability(
             val children = neighboring(findParent(potential))
             env["children-around"] = children
             env["parent"] = children.local.value
-            val childrenCount = children.neighbors.countMatching { it.id == localId }
+            val childrenCount = children.neighbors.countMatching { it.value == localId }
             env["children-count"] = childrenCount
             val neighbors = neighboring(locationS.coordinates())
             val localPosition = neighbors.local.value
