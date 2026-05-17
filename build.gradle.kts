@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.multiJvmTesting)
     alias(libs.plugins.taskTree)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 repositories {
@@ -29,6 +30,7 @@ sourceSets {
             implementation(libs.rrmxmx)
             implementation(libs.symmetric.matrix)
             implementation("com.esotericsoftware:kryo:5.6.2")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
         }
     }
 }

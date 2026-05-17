@@ -4,8 +4,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.stdlib.collapse.fold
-import java.io.Serializable
-
+import kotlinx.serialization.Serializable
 /**
  * Elect the leader in an area limited by the [radius], based on the [localStrength] of the node.
  */
@@ -34,11 +33,12 @@ inline fun <reified ID : Any, reified C : Comparable<C>> Aggregate<ID>.boundedEl
     }.leaderId
 }
 
+@Serializable
 data class Candidacy<ID : Any, C: Comparable<C>>(
     val strength: C,
     val distance: Double,
     val leaderId: ID,
-) : Serializable, Comparable<Candidacy<ID, C>> {
+) : Comparable<Candidacy<ID, C>> {
     override fun compareTo(other: Candidacy<ID, C>): Int =
         Comparator<Candidacy<ID, C>> { a, b -> b.strength.compareTo(a.strength) }
             .thenBy { it.distance }

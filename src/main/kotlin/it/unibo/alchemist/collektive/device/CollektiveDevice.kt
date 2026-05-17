@@ -76,7 +76,7 @@ class CollektiveDevice<P>(
 
     override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double>{
         val nodePosition = environment.getPosition(node)
-        return neighboring(nodePosition as Position<*>).map { position ->
+        return neighboring(nodePosition as Position<P>).map { position ->
             @Suppress("UNCHECKED_CAST")
             nodePosition.distanceTo(position.value as P) }
     }
