@@ -5,16 +5,30 @@ import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.stdlib.collapse.fold
-import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.exchanging
-import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.accumulation.findParent
 
 // A field mapping input channels to this device to the value channelled in
 data class Channel<T>(
     val isFromChild: Boolean,
     val localValue: T,
 )
+
+@PublishedApi
+internal inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findDisambiguatedParent(
+    potential: Double,
+    crossinline disambiguateParent: (ID, ID) -> ID,
+): ID = findParent(
+        potential,
+        { (id1, _), (id2, _) ->
+            when (disambiguateParent(id1, id2)) {
+                id1 -> -1
+                id2 -> 1
+                else -> error("Impossible to disambiguate parent $id2 and $id1")
+            }
+        }
+    )
 
 /**
  * Aggregate a field of type T within a spanning tree built according to the maximum
@@ -29,7 +43,7 @@ inline fun <reified T, reified ID> Aggregate<ID>.convergeCast(
     crossinline reduce: (T, T) -> T,
 ): T where ID : Comparable<ID> =
     share(local) { field ->
-        val parent = findParent(potential, disambiguateParent)
+        val parent = findDisambiguatedParent(potential, disambiguateParent)
         val neighborParents = neighboring(parent) // Each device is mapped to its parent
         val childrenValues =
             neighborParents.alignedMap(field) { _, itsParent, itsLocal ->
@@ -52,7 +66,7 @@ inline fun <reified ID> Aggregate<ID>.spreadToChildren(
     noinline disambiguateParent: (ID, ID) -> ID = { a, b -> minOf(a, b) },
 ): Double where ID : Comparable<ID> =
     exchanging(localResource) { resource ->
-        val parent = findParent(potential, disambiguateParent) // the parent of this device
+        val parent = findDisambiguatedParent(potential, disambiguateParent) // the parent of this device
         val myLocalResources =
             resource.neighbors
                 .fold(localResource) { accumulator, neighborResource ->
@@ -91,15 +105,16 @@ inline fun <reified ID> Aggregate<ID>.spreadToChildren(
 /**
  * Finds the parent of this node in the spanning tree built according to the maximum decrease in [potential].
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.findParent(
-    potential: Double,
-    disambiguateParent: (ID, ID) -> ID = { a, b -> minOf(a, b) },
-): ID {
-    val neighboringPotential = neighboring(potential).neighbors
-    val localMinimum = neighboringPotential.values.min(potential)
-    return neighboringPotential
-        .sequence
-        .filter { it.value == localMinimum }
-        .map { it.id }
-        .reduce(disambiguateParent) // the parent
-}
+//fun <ID : Comparable<ID>> Aggregate<ID>.findParent(
+//    potential: Double,
+//    disambiguateParent: (ID, ID) -> ID = { a, b -> minOf(a, b) },
+//): ID {
+//    val neighboringPotential = neighboring(potential).neighbors
+//    val localMinimum = neighboringPotential.values.min(potential)
+//    return neighboringPotential
+//        .sequence
+//        .filter { it.value == localMinimum }
+//        .map { it.id }
+//        .reduce(disambiguateParent) // the parent
+//}
+

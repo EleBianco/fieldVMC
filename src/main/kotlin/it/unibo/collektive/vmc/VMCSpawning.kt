@@ -1,5 +1,6 @@
 package it.unibo.collektive.vmc
 
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
@@ -9,8 +10,6 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.collektive.alchemist.device.sensors.SuccessSensor
-import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
-import it.unibo.collektive.coordination.findParent
 import it.unibo.collektive.lib.convergeSuccess
 import it.unibo.collektive.lib.findPotential
 import it.unibo.collektive.lib.isLeader
@@ -20,13 +19,14 @@ import it.unibo.collektive.utils.Spawner
 import it.unibo.collektive.utils.Stability
 import it.unibo.collektive.utils.determineStability
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.stdlib.accumulation.findParent
 import it.unibo.collektive.stdlib.collapse.countMatching
 
 /**
  * Entrypoint of the VMC algorithm, using spawning and destroying after stability policies.
  */
 fun Aggregate<Int>.withSpawning(
-    distanceS: DistanceSensor,
+    device: CollektiveDevice<*>,
     devSpawn: DeviceSpawn,
     env: EnvironmentVariables,
     leaderS: LeaderSensor,
@@ -34,7 +34,7 @@ fun Aggregate<Int>.withSpawning(
     random: RandomGenerator,
     resourceS: ResourceSensor,
     successS: SuccessSensor,
-): Double = spawnAndDestroyAfterStability(devSpawn, distanceS, env, leaderS, locationS, random, resourceS, successS)
+): Double = spawnAndDestroyAfterStability(devSpawn, device, env, leaderS, locationS, random, resourceS, successS)
 
 /**
  * Spawns a new node or destroys an old one if the conditions are met.
@@ -45,7 +45,7 @@ fun Aggregate<Int>.withSpawning(
  */
 fun Aggregate<Int>.spawnAndDestroyAfterStability(
     devSpawn: DeviceSpawn,
-    distanceS: DistanceSensor,
+    device: CollektiveDevice<*>,
     env: EnvironmentVariables,
     leaderS: LeaderSensor,
     locationS: LocationSensor,
@@ -53,10 +53,10 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
     resourceS: ResourceSensor,
     successS: SuccessSensor,
 ): Double =
-    with(distanceS) {
+    with(device) {
         vmc(
             devSpawn,
-            distanceS,
+            device,
             env,
             leaderS,
             locationS,
@@ -109,7 +109,7 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
  */
 fun Aggregate<Int>.vmc(
     devSpawn: DeviceSpawn,
-    distanceSensor: DistanceSensor,
+    device: CollektiveDevice<*>,
     env: EnvironmentVariables,
     leaderSensor: LeaderSensor,
     locationSensor: LocationSensor,
@@ -117,8 +117,8 @@ fun Aggregate<Int>.vmc(
     successSensor: SuccessSensor,
     spawner: Spawner,
 ): Double {
-    val isLeader = isLeader(distanceSensor, leaderSensor, resourceSensor)
-    val potential = findPotential(distanceSensor, isLeader)
+    val isLeader = isLeader(device, leaderSensor, resourceSensor)
+    val potential = findPotential(device, isLeader)
     val localSuccess = obtainLocalSuccess(successSensor)
     val success = convergeSuccess(successSensor, potential, localSuccess)
     val localResource = spreadResource(env, resourceSensor, potential, success).also {

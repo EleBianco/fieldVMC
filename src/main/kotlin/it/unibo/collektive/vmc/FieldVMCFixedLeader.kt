@@ -1,5 +1,6 @@
 package it.unibo.collektive.vmc
 
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
@@ -7,13 +8,12 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.collektive.alchemist.device.sensors.SuccessSensor
-import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
-import it.unibo.collektive.coordination.findParent
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.lib.convergeSuccess
 import it.unibo.collektive.lib.findPotential
 import it.unibo.collektive.lib.obtainLocalSuccess
 import it.unibo.collektive.lib.spreadResource
+import it.unibo.collektive.stdlib.accumulation.findParent
 import it.unibo.collektive.stdlib.collapse.countMatching
 import it.unibo.collektive.utils.SpawnerNoStability
 import it.unibo.collektive.utils.determineSpawn
@@ -23,27 +23,27 @@ import it.unibo.collektive.utils.determineSpawn
  */
 fun Aggregate<Int>.fixedRootWithSpawning(
     devSpawn: DeviceSpawn,
-    distanceS: DistanceSensor,
+    device: CollektiveDevice<*>,
     env: EnvironmentVariables,
     locationS: LocationSensor,
     random: RandomGenerator,
     resourceS: ResourceSensor,
     successS: SuccessSensor,
-): Double = fixedRootStability(devSpawn, distanceS, env, locationS, random, resourceS, successS)
+): Double = fixedRootStability(devSpawn, device, env, locationS, random, resourceS, successS)
 
 fun Aggregate<Int>.fixedRootStability(
     devSpawn: DeviceSpawn,
-    distanceS: DistanceSensor,
+    device: CollektiveDevice<*>,
     env: EnvironmentVariables,
     locationS: LocationSensor,
     random: RandomGenerator,
     resourceS: ResourceSensor,
     successS: SuccessSensor,
 ): Double =
-    with(distanceS) {
+    with(device) {
         vmcFixedLeader(
             devSpawn,
-            distanceS,
+            device,
             env,
             locationS,
             resourceS,
@@ -63,7 +63,7 @@ fun Aggregate<Int>.fixedRootStability(
 
 fun Aggregate<Int>.vmcFixedLeader(
     devSpawn: DeviceSpawn,
-    distanceS: DistanceSensor,
+    device: CollektiveDevice<*>,
     env: EnvironmentVariables,
     locationS: LocationSensor,
     resourceS: ResourceSensor,
@@ -71,7 +71,7 @@ fun Aggregate<Int>.vmcFixedLeader(
     spawner: SpawnerNoStability,
 ): Double {
     val isLeader = env.get<Boolean>("leader")
-    val potential = findPotential(distanceS, isLeader)
+    val potential = findPotential(device, isLeader)
     val localSuccess = obtainLocalSuccess(successS)
     val success = convergeSuccess(successS, potential, localSuccess)
     val localResource =

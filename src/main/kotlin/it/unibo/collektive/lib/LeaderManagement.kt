@@ -1,9 +1,9 @@
 package it.unibo.collektive.lib
 
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.sensors.LeaderSensor
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
-import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.coordination.boundedElection
 import it.unibo.collektive.stdlib.spreading.distanceTo
 
@@ -11,24 +11,24 @@ import it.unibo.collektive.stdlib.spreading.distanceTo
  * Elect the leader of the current node.
  */
 inline fun <reified ID : Comparable<ID>> Aggregate<ID>.chooseLeader(
-    distanceSensor: DistanceSensor,
+    device: CollektiveDevice<*>,
     leaderSensor: LeaderSensor,
     resourceSensor: ResourceSensor,
-): ID = boundedElection(distanceSensor, resourceSensor.getResource(), leaderSensor.leaderRadius)
+): ID = boundedElection(device, resourceSensor.getResource(), leaderSensor.leaderRadius)
 
 /**
  * Find the potential of the current node.
  */
 inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findPotential(
-    distanceSensor: DistanceSensor,
+    device: CollektiveDevice<*>,
     leader: Boolean,
-): Double = distanceTo(leader, with(distanceSensor) { distances() })
+): Double = distanceTo(leader, with(device) { distances() })
 
 /**
  * Check if the current node is the leader.
  */
 inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isLeader(
-    distanceSensor: DistanceSensor,
+    device: CollektiveDevice<*>,
     leaderSensor: LeaderSensor,
     resourceSensor: ResourceSensor,
-): Boolean = (chooseLeader(distanceSensor, leaderSensor, resourceSensor) == localId).also { leaderSensor.setLeader(it) }
+): Boolean = (chooseLeader(device, leaderSensor, resourceSensor) == localId).also { leaderSensor.setLeader(it) }
