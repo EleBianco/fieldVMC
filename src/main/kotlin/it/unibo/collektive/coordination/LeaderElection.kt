@@ -5,9 +5,12 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.stdlib.collapse.fold
 import kotlinx.serialization.Serializable
+import it.unibo.collektive.stdlib.consensus.boundedElection
 /**
  * Elect the leader in an area limited by the [radius], based on the [localStrength] of the node.
  */
+
+/*
 inline fun <reified ID : Any, reified C : Comparable<C>> Aggregate<ID>.boundedElection(
     device: CollektiveDevice<*>,
     localStrength: C,
@@ -48,4 +51,16 @@ data class Candidacy<ID : Any, C: Comparable<C>>(
                     else -> 0
                 }
             }.compare(this, other)
+}*/
+
+inline fun <reified ID : Any, reified C : Comparable<C>> Aggregate<ID>.boundedElection(
+    device: CollektiveDevice<*>,
+    localStrength: C,
+    radius: Double,
+): ID = with(device) {
+    boundedElection(
+        strength = localStrength,
+        bound = radius,
+        metric = distances()
+    )
 }
