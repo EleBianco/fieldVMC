@@ -27,7 +27,7 @@ variables:
   range: &range
     formula: cloningRange * 1.01
   cloningRange: &cloningRange
-    formula: 5
+    formula: 3
 
 network-model:
   type: ConnectWithinDistance
@@ -56,7 +56,7 @@ _pool: &program
 
 deployments:
   - type: Point
-    parameters: [0, 10]
+    parameters: [1.5, 2]
     programs:
       - *program
     properties:

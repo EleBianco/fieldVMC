@@ -5,9 +5,11 @@ import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
 import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
+import it.unibo.common.Angle
 import it.unibo.common.calculateAngle
 import it.unibo.common.minus
 import it.unibo.common.plus
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -57,7 +59,7 @@ fun Aggregate<Int>.determineSpawn(
     ) {
         val relativePositions = neighborPositions.map { it - localPosition }
         val angles = relativePositions.map { atan2(it.second, it.first) }.sorted()
-        val angle = calculateAngle(angles, random, devSpawn.maxChildren)
+        val angle = calculateAngle(angles, random, devSpawn.maxChildren, listOf(Angle(0.0, 2 * PI)))
         if (!angle.isNaN()) {
             val x = devSpawn.cloningRange * cos(angle)
             val y = devSpawn.cloningRange * sin(angle)
