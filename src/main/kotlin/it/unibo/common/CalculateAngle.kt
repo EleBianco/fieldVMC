@@ -85,7 +85,6 @@ fun calculateAngle(
     val linearDiffs = differences.flatMap { splitAtZero(it) }
     val linearSafe = safeArcs.flatMap { splitAtZero(it) } //questi dovrebbero essere già a posto
 
-    // 3. INTERSECA: Intersezione lineare purissima (senza preoccuparci dei cicli)
     val rawIntersections = mutableListOf<Angle>()
     for (diff in linearDiffs) {
         for (safe in linearSafe) {
@@ -99,13 +98,13 @@ fun calculateAngle(
     }
 
     /* NON POSSIAMO FARE MERGE PERCHè SE NO CI PERDIAMO I DOVE STAVANO I NEIGHBORS
-
     val mergedIntersections = mergeArcs(sortedRaw)*/
+
     //quindi come capiamo se l'arco a cavallo dello 0 va unito o no?
     val intersection = rawIntersections.sortedBy { it.from }
 
 
-    val validIntersections = if( !angles.isEmpty() && angles.sorted().first() != 0.0) wrapArcs(intersection) else intersection
+    val validIntersections = if( !angles.isEmpty() && angles.minOf { it } != 0.0) wrapArcs(intersection) else intersection
 
     return when {
         validIntersections.isEmpty() -> Double.NaN

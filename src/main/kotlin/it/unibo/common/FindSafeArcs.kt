@@ -26,7 +26,7 @@ fun findSafeArcs(r: Double, validator: (Double) -> Double): List<Angle>{
 /**
  * Useful to determinate if the [arc] describes a valid region.
  * Using the [validator] test if one point of the arc is valid or not
- * for properties of construction is the same validity of all the points in the arc.
+ * for properties of construction all the points in the arc have the same validity.
  * If the [validator] returns 0 iterates until finds a point in witch return non-zero or a max number of times
  * If all the points tested return 0 assumes it to be an arc sovrapposto al border so is valid
  */
