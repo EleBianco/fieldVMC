@@ -7,18 +7,15 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.common.calculateAngle
+import it.unibo.common.cbf.impl.Arc
 import it.unibo.common.findSafeArcs
 import it.unibo.common.minus
 import it.unibo.common.plus
 import java.io.Serializable
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 const val EPSILON = 1e-9
 
@@ -27,64 +24,12 @@ const val EPSILON = 1e-9
  */
 typealias SafeSpaceChecker = (Pair<Double, Double>) -> Double
 
-private fun pointsDistance(p1: Pair<Double, Double>, p2: Pair<Double, Double>): Double =
-    sqrt((p1.first - p2.first).pow(2) + (p1.second - p2.second).pow(2))
-
-private fun arco(p: Pair<Double, Double>) : Double {
-    val (x, y) = p
-    val xCent = 2.0
-    val yCent = 16.0
-    val radius = 7.0
-    val sAng = - PI / 2.0
-    val eAng = PI
-    val angle = atan2(y - yCent, x - xCent)
-    val pS = Pair(xCent + radius * cos(sAng), yCent + radius * sin(sAng))
-    val pE = Pair(xCent + radius * cos(eAng), yCent + radius * sin(eAng))
-
-    val dist = if (angle in sAng..eAng) {
-        radius - pointsDistance(p, Pair(xCent, yCent))
-    } else {
-        min(pointsDistance(p, pS), pointsDistance(p, pE))
-    }
-
-    return abs(dist)
-}
-
-private fun segmento(p: Pair<Double, Double>) : Double {
-    val a = Pair(2.0 , 2.0)
-    val b = Pair(2.0, 9.0)
-
-    val abX = b.first - a.first
-    val abY = b.second - a.second
-    val apX = p.first - a.first
-    val apY = p.second - a.second
-
-    // Lunghezza al quadrato del segmento AB (|AB|^2)
-    val abLenSq = abX * abX + abY * abY
-
-    // Caso limite: Se A e B coincidono, il segmento è un punto.
-    // La distanza è semplicemente quella tra P e A.
-    if (abLenSq == 0.0) return pointsDistance(p, a)
-
-    // Calcolo del fattore di proiezione t tramite prodotto scalare
-    val t = (apX * abX + apY * abY) / abLenSq
-
-    // Clamping di t nell'intervallo [0.0, 1.0] per non uscire dal segmento
-    val tClamped = t.coerceIn(0.0, 1.0)
-
-    // Coordinate del punto più vicino sul segmento
-    val closestX = a.first + tClamped * abX
-    val closestY = a.second + tClamped * abY
-
-    // Restituisce la distanza euclidea tra P e il punto più vicino trovato
-    return pointsDistance(p, Pair(closestX, closestY))
-}
-
 private fun defaultSafeSpaceChecker(p: Pair<Double, Double>): Double {
 
+    val sdf = Arc(Pair(0.0, 10.0), 10.0, PI / 2.0, 5.0 /4.0 * PI)
+    val thickness = 2.5
 
-    return 100.0
-
+    return thickness - sdf(p)
 }
 
 /**
