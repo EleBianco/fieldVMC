@@ -21,6 +21,7 @@ import it.unibo.collektive.utils.determineStability
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.accumulation.findParent
 import it.unibo.collektive.stdlib.collapse.countMatching
+import it.unibo.collektive.alchemist.device.properties.CBF
 
 /**
  * Entrypoint of the VMC algorithm, using spawning and destroying after stability policies.
@@ -34,7 +35,8 @@ fun Aggregate<Int>.withSpawning(
     random: RandomGenerator,
     resourceS: ResourceSensor,
     successS: SuccessSensor,
-): Double = spawnAndDestroyAfterStability(devSpawn, device, env, leaderS, locationS, random, resourceS, successS)
+    cbf: CBF,
+): Double = spawnAndDestroyAfterStability(devSpawn, device, env, leaderS, locationS, random, resourceS, successS, cbf)
 
 /**
  * Spawns a new node or destroys an old one if the conditions are met.
@@ -52,6 +54,7 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
     random: RandomGenerator,
     resourceS: ResourceSensor,
     successS: SuccessSensor,
+    cbf: CBF,
 ): Double =
     with(device) {
         vmc(
@@ -96,6 +99,7 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
                     env,
                     random,
                     resourceS,
+                    cbf::isSafe
                 )
             }
         }

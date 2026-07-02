@@ -1,6 +1,6 @@
-package it.unibo.common.cbf.impl
+package it.unibo.common.sdf.impl
 
-import it.unibo.common.cbf.SDF
+import it.unibo.common.sdf.SDF
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -13,7 +13,9 @@ class Star (
     private val center: Pair<Double, Double>,
     private val radius: Double,
     private val n: Int,
-    m: Double = n / 2.0 //m determines how much the angles between the points are profound
+    m: Double = n / 2.0, //m determines how much the angles between the points are profound
+    private val isRing: Boolean = false, //if true, the space is a ring shaped like a star
+    private val thickness: Double = 0.0, //thickness of the ring, or used to make round corners
 ) : SDF {
 
     private val an = PI / n.toDouble()
@@ -48,7 +50,7 @@ class Star (
         px += ecsX * clamped
         py += ecsY * clamped
 
-        val distance = sqrt(px * px + py * py)
-        return distance * sign(px)
+        val distance = sqrt(px * px + py * py) * sign(px)
+        return if(isRing) abs( distance) - thickness else distance - thickness
     }
 }

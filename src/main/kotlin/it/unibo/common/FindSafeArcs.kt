@@ -2,6 +2,12 @@ package it.unibo.common
 
 import kotlin.math.PI
 
+/**
+ * Identifies and returns a list of arcs that lie entirely within a safe region.
+ *
+ * The safe region is determined along a circumference of radius [r] using the provided [validator]
+ * function, which computes the distance from a specific point (given its angle) to the boundary.
+ */
 fun findSafeArcs(r: Double, validator: (Double) -> Double): List<Angle>{
     val zeros = findZeros(r, validator).sorted() //dovrebbero già essere in ordine per come è fatto findZeros!
     //però sempre meglio dare una controllata?
@@ -24,36 +30,39 @@ fun findSafeArcs(r: Double, validator: (Double) -> Double): List<Angle>{
 }
 
 /**
- * Useful to determinate if the [arc] describes a valid region.
- * Using the [validator] test if one point of the arc is valid or not
- * for properties of construction all the points in the arc have the same validity.
- * If the [validator] returns 0 iterates until finds a point in witch return non-zero or a max number of times
- * If all the points tested return 0 assumes it to be an arc sovrapposto al border so is valid
+ * Determines whether a given [arc] describes a valid (safe) region.
+ *
+ * The function evaluates the arc's safety by sampling points using the provided [validator].
+ * Due to the construction properties, the entire arc shares the same validity as any of its
+ * sampled points that do not evaluate to zero.
+ *
+ * If the [validator] evaluates to `0.0` (indicating the point lies exactly on a boundary),
+ * the algorithm iteratively samples additional points at increasing depths up to a maximum limit.
+ * If all tested points evaluate to `0.0`, the arc is assumed to perfectly overlap the boundary
+ * and is considered safe.
  */
 fun isArcSafe(arc: Angle, validator: (Double) -> Double): Boolean {
-
+    val MAX_DEPTH = 10
     var divisor = 2.0
-    val maxDepth = 10 // Limite di sicurezza per evitare loop infiniti
-    var depth = 0
+    var isSafe = true
 
-    while (depth < maxDepth) {
+    for (depth in 0 until MAX_DEPTH) {
         val step = arc.arc / divisor
 
-        // Controlliamo il punto a sinistra del centro
-        var d = validator(arc.from + step)
-        if (d > 0.0) return true
-        if (d < 0.0) return false
+        val dLeft = validator(arc.from + step)
+        if (dLeft != 0.0) {
+            isSafe = dLeft > 0.0
+            break
+        }
 
-        // Controlliamo il punto a destra del centro (con divisor = 2.0) controlliamo due volte lo stesso punto
-        d = validator(arc.from + arc.arc - step)
-        if (d > 0.0) return true
-        if (d < 0.0) return false
+        val dRight = validator(arc.from + arc.arc - step)
+        if (dRight != 0.0) {
+            isSafe = dRight > 0.0
+            break
+        }
 
         divisor *= 2.0
-        depth++
     }
 
-    // se tutti i test ci hanno dato esattamente 0 assumiamo che tutto l'arco sia sovrapposto al bordo
-    //consideriamo il bordo ancora safe
-    return true
+    return isSafe
 }

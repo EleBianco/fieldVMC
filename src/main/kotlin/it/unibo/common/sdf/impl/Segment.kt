@@ -1,11 +1,12 @@
-package it.unibo.common.cbf.impl
+package it.unibo.common.sdf.impl
 
-import it.unibo.common.cbf.SDF
+import it.unibo.common.sdf.SDF
 import it.unibo.common.pointsDistance
 
 class Segment (
     private val a: Pair<Double, Double>,
-    private val b: Pair<Double, Double>
+    private val b: Pair<Double, Double>,
+    private val thickness: Double = 0.0,
 ) : SDF {
     override fun invoke(p: Pair<Double, Double>): Double {
 
@@ -25,6 +26,6 @@ class Segment (
         val closestX = a.first + tClamped * abX
         val closestY = a.second + tClamped * abY
 
-        return pointsDistance(p, Pair(closestX, closestY))
+        return pointsDistance(p, Pair(closestX, closestY)) - thickness
     }
 }

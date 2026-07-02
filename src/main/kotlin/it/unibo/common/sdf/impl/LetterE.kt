@@ -1,10 +1,11 @@
-package it.unibo.common.cbf.impl
+package it.unibo.common.sdf.impl
 
-import it.unibo.common.cbf.SDF
+import it.unibo.common.sdf.SDF
 
 class LetterE (
     start: Pair<Double, Double>,
     height: Double,
+    private val thickness: Double = 0.0,
 ) : SDF{
     private val vertical = Segment(start, Pair(start.first, start.second + height))
     private val horizontalLow = Segment(start, Pair(start.first + height / 2.0, start.second))
@@ -12,6 +13,6 @@ class LetterE (
     private val horizontalHigh = Segment(Pair(start.first, start.second + height), Pair(start.first + height / 2.0, start.second + height))
 
     override fun invoke(p: Pair<Double, Double>): Double {
-        return minOf(vertical(p), horizontalLow(p), horizontalCenter(p), horizontalHigh(p))
+        return minOf(vertical(p), horizontalLow(p), horizontalCenter(p), horizontalHigh(p)) - thickness
     }
 }

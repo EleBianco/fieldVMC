@@ -5,20 +5,36 @@ import kotlin.math.abs
 import kotlin.math.asin
 import kotlin.math.sign
 
-//valori indicativi da capire come tararli bene!
+/**
+ * The minimum distance threshold used to calculate the next angular step.
+ * If the computed distance to the boundary falls below this value, [MIN] is used
+ * instead to prevent the algorithm from taking excessively small steps when
+ * approaching an intersection.
+ */
 const val MIN = 1e-7
+
+/**
+ * The tolerance threshold for the bisection algorithm.
+ * The search stops when the search interval is smaller than this value.
+ */
 const val TOLERANCE = 1e-10
+
+/**
+ * A scaling factor applied to the distance from the boundary.
+ * Used to compensate for minor calculation inaccuracies or Signed Distance Field (SDF) approximations.
+ */
 const val IMPRECISION = 0.95
 
 /**
- * Given a distance [r] (the distance of the spawn for example)
- * and a [validator] that taken an angle returns the distance from the nearest border
- * returns a collection of all the angles in which occurs an intersection between the circumference and the border.
+ * Finds the angles at which a circumference of radius [r] intersects a boundary.
  *
- * N.B.: non trova punti di tangenza a meno che non ci caschi esattamente sopra perché non c'è cambio di segno.
- *      E non ci casca sopra praticamente mai perché ci spostiamo sempre di un po' meno di [d] per correggere le approssimazioni!
- * N.M.B.: se due zeri hanno una distanza tra loro minore di MIN potremmo saltarli e non trovare nessuno dei due
- * */
+ * Iterates along the circumference and uses the [validator] function to detect sign changes,
+ * which indicate an intersection between the circumference and the border.
+ *
+ * Note: Tangency points are not detected unless the sample falls exactly on them,
+ * because there is no sign change. Furthermore, if two zero-crossings are closer
+ * to each other than [MIN], they might be skipped and not detected.
+*/
 fun findZeros(r: Double, validator: (Double) -> Double): List<Double> {
     
     val zeros = mutableListOf<Double>()
@@ -73,36 +89,29 @@ fun findZeros(r: Double, validator: (Double) -> Double): List<Double> {
 
 fun bisection(first: Double, second: Double, validator: (Double) -> Double): Double {
 
-    var pos: Double
-    var neg: Double
+    val vFirst = validator(first)
+    val vSecond = validator(second)
 
-    if( validator(first) < 0.0 && validator(second) > 0.0 ) {
-        neg = first
-        pos = second
-    } else if(validator(first) > 0.0 && validator(second) < 0.0) {
-        neg = second
-        pos = first
-    } else {
-        throw IllegalArgumentException("bisection invalid")
+    require(sign(vFirst) * sign(vSecond) == -1.0) {
+        "Bisection invalid: provided bounds must have opposite signs."
     }
 
+    var pos = if (vFirst > 0.0) first else second
+    var neg = if (vFirst < 0.0) first else second
     var temp: Double
 
     do {
         temp = (pos + neg) / 2.0
-
         val d = validator(temp)
 
-        if( d < 0.0) {
+        if (d < 0.0) {
             neg = temp
-        } else if( d > 0.0) {
+        } else if (d > 0.0) {
             pos = temp
         } else {
             return temp
         }
-
     } while (abs(pos - neg) > TOLERANCE)
 
     return temp
-
 }

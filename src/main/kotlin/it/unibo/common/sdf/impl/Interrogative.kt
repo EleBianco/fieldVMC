@@ -1,19 +1,20 @@
-package it.unibo.common.cbf.impl
+package it.unibo.common.sdf.impl
 
-import it.unibo.common.cbf.SDF
+import it.unibo.common.sdf.SDF
 import kotlin.math.PI
 import kotlin.math.min
 
 class Interrogative (
     center: Pair<Double, Double>,
     radius: Double,
+    private val thickness: Double = 0.0,
 ) : SDF {
 
     private val arc = Arc(
         center,
         radius,
         - PI / 2.0,
-        11.0 / 6.0 * PI
+        3.0 / 2.0 * PI
     )
     private val segment = Segment(
         Pair(center.first, center.second - radius),
@@ -21,6 +22,6 @@ class Interrogative (
     )
 
     override fun invoke(p: Pair<Double, Double>): Double {
-        return min(arc(p), segment(p))
+        return min(arc(p), segment(p)) - thickness
     }
 }

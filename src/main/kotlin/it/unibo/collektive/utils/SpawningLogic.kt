@@ -7,30 +7,15 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.common.calculateAngle
-import it.unibo.common.cbf.impl.Arc
 import it.unibo.common.findSafeArcs
 import it.unibo.common.minus
 import it.unibo.common.plus
 import java.io.Serializable
-import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
 const val EPSILON = 1e-9
-
-/**
- * Type alias for a function that checks if a position is in a safe space.
- */
-typealias SafeSpaceChecker = (Pair<Double, Double>) -> Double
-
-private fun defaultSafeSpaceChecker(p: Pair<Double, Double>): Double {
-
-    val sdf = Arc(Pair(0.0, 10.0), 10.0, PI / 2.0, 5.0 /4.0 * PI)
-    val thickness = 2.5
-
-    return thickness - sdf(p)
-}
 
 /**
  * Type alias for a function that spawns devices in an aggregate given some parameters:
@@ -77,7 +62,7 @@ fun Aggregate<Int>.determineStability(
     env: EnvironmentVariables,
     random: RandomGenerator,
     resourceS: ResourceSensor,
-    safeSpaceChecker: SafeSpaceChecker = ::defaultSafeSpaceChecker,
+    safeSpaceChecker: (Pair<Double, Double>) -> Double,
 ): Stability {
     val enoughTime = now > lastChanged + devSpawn.minSpawnWait
     val everyoneIsDestroyStable = now > lastChanged

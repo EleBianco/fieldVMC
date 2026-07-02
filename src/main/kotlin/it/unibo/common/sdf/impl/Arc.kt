@@ -1,6 +1,6 @@
-package it.unibo.common.cbf.impl
+package it.unibo.common.sdf.impl
 
-import it.unibo.common.cbf.SDF
+import it.unibo.common.sdf.SDF
 import it.unibo.common.pointsDistance
 import kotlin.math.PI
 import kotlin.math.abs
@@ -14,6 +14,7 @@ class Arc(
     private val radius: Double,
     private val startAngle: Double,
     private val aperture: Double,
+    private val thickness: Double = 0.0,
 ) : SDF {
     private val endAngle = startAngle + aperture
     private val pS = Pair(center.first + radius * cos(startAngle), center.second + radius * sin(startAngle))
@@ -25,10 +26,12 @@ class Arc(
 
         val normalizedAngle = (angle - startAngle).mod(2.0 * PI)
 
-        return if (normalizedAngle <= aperture) {
+        val distance = if (normalizedAngle <= aperture) {
             abs(radius - pointsDistance(p, center))
         } else {
             min(pointsDistance(p, pS), pointsDistance(p, pE))
         }
+
+        return distance - thickness
     }
 }

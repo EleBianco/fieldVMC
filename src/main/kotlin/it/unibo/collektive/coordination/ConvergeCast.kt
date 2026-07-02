@@ -10,12 +10,6 @@ import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.stdlib.accumulation.convergeCast
 import it.unibo.collektive.stdlib.accumulation.findParent
 
-// A field mapping input channels to this device to the value channelled in
-data class Channel<T>(
-    val isFromChild: Boolean,
-    val localValue: T,
-)
-
 @PublishedApi
 internal inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findDisambiguatedParent(
     potential: Double,
@@ -37,26 +31,6 @@ internal inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findDisambiguated
  * Accumulate the [potential] according to the [reduce] function.
  * [local] is the value field providing the value to be collected for each device.
  */
-/*
-inline fun <reified T, reified ID> Aggregate<ID>.convergeCast(
-    potential: Double,
-    local: T,
-    noinline disambiguateParent: (ID, ID) -> ID = { a, b -> minOf(a, b) },
-    crossinline reduce: (T, T) -> T,
-): T where ID : Comparable<ID> =
-    share(local) { field ->
-        val parent = findDisambiguatedParent(potential, disambiguateParent)
-        val neighborParents = neighboring(parent) // Each device is mapped to its parent
-        val childrenValues =
-            neighborParents.alignedMap(field) { _, itsParent, itsLocal ->
-                Channel(isFromChild = itsParent == localId, localValue = itsLocal)
-            }
-        childrenValues.neighbors.fold(local) { accumulator, channel ->
-            if (channel.value.isFromChild) reduce(accumulator, channel.value.localValue) else accumulator
-        }
-    }
-*/
-
 inline fun <reified T, reified ID> Aggregate<ID>.convergeCast(
     potential: Double,
     local: T,
@@ -123,20 +97,4 @@ inline fun <reified ID> Aggregate<ID>.spreadToChildren(
                 neighboring(myLocalResources)
             }
     }.local.value
-
-/**
- * Finds the parent of this node in the spanning tree built according to the maximum decrease in [potential].
- */
-//fun <ID : Comparable<ID>> Aggregate<ID>.findParent(
-//    potential: Double,
-//    disambiguateParent: (ID, ID) -> ID = { a, b -> minOf(a, b) },
-//): ID {
-//    val neighboringPotential = neighboring(potential).neighbors
-//    val localMinimum = neighboringPotential.values.min(potential)
-//    return neighboringPotential
-//        .sequence
-//        .filter { it.value == localMinimum }
-//        .map { it.id }
-//        .reduce(disambiguateParent) // the parent
-//}
 

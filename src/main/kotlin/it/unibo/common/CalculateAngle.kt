@@ -119,7 +119,7 @@ fun calculateAngle(
 
 /**
  * Given [arc] it normalizes it in the range [0. 2PI)
- * If the arc passes the 0 it is split in two normalized arcs
+ * If the arc passes the 0, it is split in two normalized arcs
  */
 fun splitAtZero(arc: Angle): List<Angle> {
 
