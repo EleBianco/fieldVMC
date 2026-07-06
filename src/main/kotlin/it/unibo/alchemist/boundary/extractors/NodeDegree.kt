@@ -7,6 +7,13 @@ import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 
+/**
+ * An Alchemist extractor that computes the degree (number of neighbors) of each node in the environment.
+ *
+ * It extends [AbstractAggregatingDoubleExtractor] to automatically aggregate the results (e.g., mean, max)
+ * across all nodes. It can optionally filter the neighborhood to count only nodes that share a
+ * hierarchical relationship (parent-child).
+ */
 class NodeDegree
     @JvmOverloads
     constructor(

@@ -9,6 +9,15 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of an arc.
+ *
+ * @property center The (X, Y) coordinates of the arc's center.
+ * @property radius The radius of the arc.
+ * @property startAngle The starting angle of the arc in radians.
+ * @property aperture The angular length of the arc in radians.
+ * @property thickness The thickness of the arc (default is 0.0).
+ */
 class Arc(
     private val center: Pair<Double, Double>,
     private val radius: Double,

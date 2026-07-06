@@ -87,6 +87,16 @@ fun findZeros(r: Double, validator: (Double) -> Double): List<Double> {
     return zeros
 }
 
+/**
+ * Finds the root of the [validator] function within the interval defined by [first] and [second]
+ * using the bisection method.
+ *
+ * @param first The first bound of the interval.
+ * @param second The second bound of the interval.
+ * @param validator The function for which the root is being found.
+ * @return The angle (in radians) that represents the root.
+ * @throws IllegalArgumentException If [first] and [second] do not bracket a root (i.e., they have the same sign).
+ */
 fun bisection(first: Double, second: Double, validator: (Double) -> Double): Double {
 
     val vFirst = validator(first)

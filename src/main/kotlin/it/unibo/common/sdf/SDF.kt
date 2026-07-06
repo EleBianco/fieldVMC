@@ -1,5 +1,9 @@
 package it.unibo.common.sdf
 
+/**
+ * Represents a 2D Signed Distance Field (SDF).
+ * A functional interface that evaluates the signed distance from a given point to the boundary of a shape.
+ */
 fun interface SDF {
     /**
      * returns the distance of the point [p] from the surface of the SDF.

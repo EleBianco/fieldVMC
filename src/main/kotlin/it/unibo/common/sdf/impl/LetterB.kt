@@ -3,6 +3,13 @@ package it.unibo.common.sdf.impl
 import it.unibo.common.sdf.SDF
 import kotlin.math.PI
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of the letter B.
+ *
+ * @param start The (X, Y) coordinates of the starting point of the vertical stem.
+ * @param height The total height of the letter.
+ * @property thickness The thickness of the letter's strokes (default is 0.0).
+ */
 class LetterB (
     start: Pair<Double, Double>,
     height: Double,

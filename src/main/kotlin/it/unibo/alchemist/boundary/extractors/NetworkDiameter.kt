@@ -6,6 +6,9 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.util.Environments.networkDiameterByHopDistance
 
+/**
+ * An Alchemist [Extractor] that computes and exports the network diameter of the simulated environment.
+ */
 class NetworkDiameter : Extractor<Double> {
     private companion object {
         private const val NAME: String = "network-diameter"

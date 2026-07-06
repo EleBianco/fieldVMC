@@ -15,6 +15,9 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * A small constant used to handle floating-point approximations.
+ */
 const val EPSILON = 1e-9
 
 /**
@@ -35,10 +38,22 @@ typealias Spawner = Aggregate<Int>.(
     localResource: Double,
 ) -> Unit
 
+/**
+ * Represents the stability state of a node regarding its ability to spawn or destroy.
+ *
+ * @property spawnStable Indicates whether the node is stable for spawning.
+ * @property destroyStable Indicates whether the node is stable for destruction.
+ */
 data class Stability(
     val spawnStable: Boolean = false,
     val destroyStable: Boolean = false,
 ): Serializable {
+    /**
+     * Combines this stability state with another one using a logical AND.
+     *
+     * @param other The other stability state to combine with.
+     * @return True if both states are completely stable for both spawning and destruction.
+     */
     infix fun and(other: Stability): Boolean = spawnStable && other.spawnStable && destroyStable && other.destroyStable
 }
 

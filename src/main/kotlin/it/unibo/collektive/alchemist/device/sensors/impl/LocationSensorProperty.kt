@@ -6,6 +6,15 @@ import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 
+/**
+ * An Alchemist [NodeProperty] that provides the node with its current location
+ * and the locations of its neighboring nodes.
+ *
+ * @param T The concentration type of the node.
+ * @param P The position type of the environment.
+ * @param environment The simulation environment.
+ * @property node The Alchemist node this property is attached to.
+ */
 class LocationSensorProperty<T : Any, P : Position<P>>(
     private val environment: Environment<T, P>,
     override val node: Node<T>,

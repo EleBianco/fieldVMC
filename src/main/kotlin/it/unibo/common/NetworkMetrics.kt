@@ -6,6 +6,9 @@ import kotlin.collections.component2
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * Utility object containing extension functions to calculate various network metrics.
+ */
 object NetworkMetrics {
     /**
      * The network density.

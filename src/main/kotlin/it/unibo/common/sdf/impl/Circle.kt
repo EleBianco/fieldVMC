@@ -4,7 +4,15 @@ import it.unibo.common.sdf.SDF
 import it.unibo.common.pointsDistance
 import kotlin.math.abs
 
-class Circle (
+/**
+ * Represents a 2D Signed Distance Field (SDF) of a circle or a ring.
+ *
+ * @property center The (X, Y) coordinates of the circle's center.
+ * @property radius The radius of the circle.
+ * @property isRing True if the shape is a hollow ring instead of a solid circle (default is false).
+ * @property thickness The thickness of the ring if [isRing] is true (default is 0.0).
+ */
+class Circle(
     private val center: Pair<Double, Double>,
     private val radius: Double,
     private val isRing: Boolean = false,

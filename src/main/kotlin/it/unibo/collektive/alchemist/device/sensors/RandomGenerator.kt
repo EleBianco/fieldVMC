@@ -1,5 +1,8 @@
 package it.unibo.collektive.alchemist.device.sensors
 
+/**
+ * Interface representing a random number generator that provides values based on the simulation environment's seed.
+ */
 interface RandomGenerator {
     /**
      * Generate a random double given the environment seed.

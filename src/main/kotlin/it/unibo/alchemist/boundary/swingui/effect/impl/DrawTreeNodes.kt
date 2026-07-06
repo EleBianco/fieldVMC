@@ -17,15 +17,31 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.nextUp
 
+/**
+ * An Alchemist [Effect] that draws nodes of a tree structure in the UI.
+ *
+ * It visualizes individual nodes, scaling their size and determining their color
+ * based on their local success and resource concentrations. Leaders are highlighted
+ * with special concentric arcs.
+ */
 class DrawTreeNodes : Effect {
     override fun getColorSummary(): Color = Color.BLACK
 
+    /**
+     * The timestamp of the last update, used to prevent redundant iteration over nodes.
+     */
     @Transient
     var lastUpdated = Time.NEGATIVE_INFINITY
 
+    /**
+     * The maximum local success value found among all nodes.
+     */
     @Transient
     var maxSuccess = 0.0
 
+    /**
+     * The maximum resource value found among all nodes.
+     */
     @Transient
     var maxResource = 0.0
 
@@ -79,10 +95,14 @@ class DrawTreeNodes : Effect {
                 )
             if (isLeader) {
                 g.stroke = BasicStroke(0.1f * sizeInScreenCoordinates.x.toFloat(), BasicStroke.CAP_ROUND, BasicStroke.CAP_BUTT)
-//                g.drawLine(viewPoint.x, viewPoint.y - boundingBoxSize.y, viewPoint.x, viewPoint.y + sizeInScreenCoordinates.y)
-//                g.drawLine(viewPoint.x + boundingBoxSize.x, viewPoint.y, viewPoint.x - sizeInScreenCoordinates.x, viewPoint.y)
-//                g.drawLine(viewPoint.x - boundingBoxSize.x, viewPoint.y - boundingBoxSize.y, viewPoint.x + sizeInScreenCoordinates.x, viewPoint.y + sizeInScreenCoordinates.y)
-//                g.drawLine(viewPoint.x - boundingBoxSize.x, viewPoint.y + boundingBoxSize.y, viewPoint.x + sizeInScreenCoordinates.x, viewPoint.y - boundingBoxSize.y)
+//                g.drawLine(viewPoint.x, viewPoint.y - boundingBoxSize.y,
+//                    viewPoint.x, viewPoint.y + sizeInScreenCoordinates.y)
+//                g.drawLine(viewPoint.x + boundingBoxSize.x, viewPoint.y,
+//                    viewPoint.x - sizeInScreenCoordinates.x, viewPoint.y)
+//                g.drawLine(viewPoint.x - boundingBoxSize.x, viewPoint.y - boundingBoxSize.y,
+//                    viewPoint.x + sizeInScreenCoordinates.x, viewPoint.y + sizeInScreenCoordinates.y)
+//                g.drawLine(viewPoint.x - boundingBoxSize.x, viewPoint.y + boundingBoxSize.y,
+//                    viewPoint.x + sizeInScreenCoordinates.x, viewPoint.y - boundingBoxSize.y)
                 listOf(
                     1 to 2,
                     6 to 9,
@@ -126,12 +146,34 @@ class DrawTreeNodes : Effect {
         }
     }
 
+    /**
+     * Utility functions, molecules, and constants for rendering.
+     */
     companion object {
+        /**
+         * Molecule used to identify the parent of a node.
+         */
         val myParent = SimpleMolecule("parent")
+
+        /**
+         * Molecule representing the local success of a node.
+         */
         val localSuccess = SimpleMolecule("success")
+
+        /**
+         * Molecule representing the local resource of a node.
+         */
         val resource = SimpleMolecule("resource")
+
+        /**
+         * Molecule indicating if a node is a leader.
+         */
         val leader = SimpleMolecule("leader")
-        val minNodeSize = 10
+
+        /**
+         * The minimum visual size of a node on the screen.
+         */
+        const val minNodeSize = 10
 
         private fun Any?.toInt(): Int? =
             when (this) {

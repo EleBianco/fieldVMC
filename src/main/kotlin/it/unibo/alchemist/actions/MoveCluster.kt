@@ -8,6 +8,12 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.actions.AbstractAction
 
+/**
+ * An Alchemist action that moves the specified [node] horizontally by a given [movingRange].
+ *
+ * Upon execution, the node's current X coordinate is incremented by the [movingRange],
+ * while the Y coordinate remains unchanged.
+ */
 class MoveCluster<T : Any, P : Position<P>>(
     private val environment: Environment<T, P>,
     private val node: Node<T>,

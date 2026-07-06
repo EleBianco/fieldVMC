@@ -19,6 +19,11 @@ interface ExecutionClock {
      */
     fun nextClock()
 
+    /**
+     * Notifies the entity that it has just been spawned, initializing its state accordingly.
+     *
+     * @param time The time when the spawn event occurred.
+     */
     fun justSpawned(time: Int)
 }
 

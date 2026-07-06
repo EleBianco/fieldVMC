@@ -8,6 +8,9 @@ import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.util.Environments.allSubNetworksByNode
 
+/**
+ * An Alchemist extractor that computes the diameter of each subnetwork in the environment.
+ */
 class SubnetworksDiameter
 @JvmOverloads
 constructor(

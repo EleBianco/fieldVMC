@@ -11,6 +11,18 @@ import it.unibo.collektive.alchemist.device.sensors.DeviceSpawn
 import org.apache.commons.math3.random.RandomGenerator
 import kotlin.math.nextUp
 
+/**
+ * An Alchemist [NodeProperty] that allows a node to spawn new nodes or destroy itself.
+ *
+ * @param T The concentration type of the node.
+ * @param P The position type of the environment.
+ * @param randomGenerator The random engine used for adding jitter to spawn times.
+ * @param environment The simulation environment.
+ * @property node The Alchemist node this property is attached to.
+ * @property cloningRange The fixed distance from the node at which a new spawn occurs.
+ * @property maxChildren The maximum number of children this node is allowed to spawn.
+ * @property minSpawnWait The minimum amount of time to wait before a new spawn is allowed.
+ */
 class DeviceSpawner<T, P : Position<P>>
     @JvmOverloads
     constructor(

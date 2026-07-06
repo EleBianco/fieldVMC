@@ -9,6 +9,16 @@ import kotlin.math.sign
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of a star shape or a star-shaped ring.
+ *
+ * @property center The (X, Y) coordinates of the star's center.
+ * @property radius The radius of the star.
+ * @property n The number of points on the star.
+ * @param m Determines how deep/profound the angles between the points are (default is n / 2.0).
+ * @property isRing True if the space is a ring shaped like a star instead of a solid star (default is false).
+ * @property thickness The thickness of the ring, or used to make round corners (default is 0.0).
+ */
 class Star (
     private val center: Pair<Double, Double>,
     private val radius: Double,

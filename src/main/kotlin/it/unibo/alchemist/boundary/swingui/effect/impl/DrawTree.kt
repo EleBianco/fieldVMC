@@ -25,15 +25,30 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+/**
+ * An Alchemist [Effect] that draws a tree structure connecting nodes to their parents.
+ *
+ * It visualizes the hierarchical relationship and maps resources and success values
+ * to the thickness and color of the connecting lines.
+ */
 class DrawTree : Effect {
     override fun getColorSummary(): Color = Color.BLACK
 
+    /**
+     * The timestamp of the last update, used to avoid redundant calculations.
+     * */
     @Transient
     var lastUpdated = Time.NEGATIVE_INFINITY
 
+    /**
+     * The maximum local success value found in the current environment.
+     */
     @Transient
     var maxSuccess = 0.0
 
+    /**
+     * The maximum resource value found in the current environment.
+     */
     @Transient
     var maxResource = 0.0
 
@@ -102,9 +117,24 @@ class DrawTree : Effect {
         }
     }
 
+    /**
+     * Utility functions and constants for geometric tree rendering.
+     */
     companion object {
+
+        /**
+         * Molecule used to identify the parent of a node.
+         */
         val myParent = SimpleMolecule("parent")
+
+        /**
+         * Pattern for dashed lines representing non-parent connections.
+         */
         val dashPattern = floatArrayOf(1f, 5f)
+
+        /**
+         * Minimum arc distance for rendering.
+         */
         val minArcDistance = 10
 
         private fun Any?.toInt(): Int? =
@@ -130,17 +160,30 @@ class DrawTree : Effect {
 
         private operator fun Point.minus(other: Point): Point = Point(x - other.x, y - other.y)
 
+        /**
+         * Represents a mathematical line defined by a passing point ([x], [y]) and a [slope].
+         *
+         * @property x The X coordinate of the point.
+         * @property y The Y coordinate of the point.
+         * @property slope The slope of the line.
+         */
         data class Line(
             val x: Int,
             val y: Int,
             val slope: Double,
         )
 
+        /**
+         * Computes the geometric midpoint between [p1] and [p2].
+         */
         fun midpoint(
             p1: Point,
             p2: Point,
         ): Point = Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
 
+        /**
+         * Computes the perpendicular bisector [Line] between [p1] and [p2].
+         */
         fun perpendicularBisector(
             p1: Point,
             p2: Point,
@@ -156,6 +199,10 @@ class DrawTree : Effect {
             return Line(midPoint.x, midPoint.y, bisectorSlope)
         }
 
+        /**
+         * Calculates the intersection points of a circle with a given radius [r],
+         * centered at ([x2], [y2]), intersecting a segment originating from ([x1], [y1]).
+         */
         fun circleIntersection(
             r: Double,
             x1: Int,
@@ -173,6 +220,9 @@ class DrawTree : Effect {
             return arrayOf(Point(xc1.toInt(), yc1.toInt()), Point(xc2.toInt(), yc2.toInt()))
         }
 
+        /**
+         * Shifts the midpoint between [p1] and [p2] perpendicularly by a distance [d].
+         */
         fun midpointShift(
             p1: Point,
             p2: Point,
@@ -190,6 +240,10 @@ class DrawTree : Effect {
             return points[0] to points[1]
         }
 
+        /**
+         * Calculates circles passing through [p1] and [p2] whose centers are
+         * shifted perpendicularly from the midpoint by distance [d].
+         */
         fun circlesThrough(
             p1: Point,
             p2: Point,
@@ -220,12 +274,22 @@ class DrawTree : Effect {
     }
 }
 
+/**
+ * Represents a geometric circle.
+ *
+ * @property x The X coordinate of the center.
+ * @property y The Y coordinate of the center.
+ * @property radius The radius of the circle.
+ */
 data class Circle(
     val x: Int,
     val y: Int,
     val radius: Double,
 )
 
+/**
+ * Test function.
+ */
 fun main() {
     println(circlesThrough(Point(0, 0), Point(0, 10), 15))
 }

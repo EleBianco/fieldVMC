@@ -9,6 +9,15 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.alchemist.device.sensors.SuccessSensor
 
+/**
+ * An Alchemist [NodeProperty] that provides the node with the capability to track and manage success metrics.
+ *
+ * @param T The concentration type of the node.
+ * @param P The position type of the environment.
+ * @param maxSuccess The maximum possible success value.
+ * @property node The Alchemist node this property is attached to.
+ * @param environment The simulation environment.
+ */
 class SuccessSensorProperty<T, P : Position<P>>(
     private val maxSuccess: Double,
     override val node: Node<T>,

@@ -31,6 +31,9 @@ fun Aggregate<Int>.fixedRootWithSpawning(
     successS: SuccessSensor,
 ): Double = fixedRootStability(devSpawn, device, env, locationS, random, resourceS, successS)
 
+/**
+ * Executes the VMC algorithm with a fixed root, incorporating stability checks for spawning.
+ */
 fun Aggregate<Int>.fixedRootStability(
     devSpawn: DeviceSpawn,
     device: CollektiveDevice<*>,
@@ -61,6 +64,9 @@ fun Aggregate<Int>.fixedRootStability(
         }
     }
 
+/**
+ * Core execution logic of the VMC algorithm with a fixed leader.
+ */
 fun Aggregate<Int>.vmcFixedLeader(
     devSpawn: DeviceSpawn,
     device: CollektiveDevice<*>,

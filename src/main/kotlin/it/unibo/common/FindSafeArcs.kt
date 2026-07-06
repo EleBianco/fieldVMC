@@ -42,11 +42,11 @@ fun findSafeArcs(r: Double, validator: (Double) -> Double): List<Angle>{
  * and is considered safe.
  */
 fun isArcSafe(arc: Angle, validator: (Double) -> Double): Boolean {
-    val MAX_DEPTH = 10
+    val maxDepth = 10
     var divisor = 2.0
     var isSafe = true
 
-    for (depth in 0 until MAX_DEPTH) {
+    for (depth in 0 until maxDepth) {
         val step = arc.arc / divisor
 
         val dLeft = validator(arc.from + step)

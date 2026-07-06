@@ -6,6 +6,9 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 
+/**
+ * An Alchemist [Extractor] that computes the total number of leaf nodes in the environment.
+ */
 class NumberOfLeaves : Extractor<Double> {
     private companion object {
         private const val NAME = "number-of-leaves"

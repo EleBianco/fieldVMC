@@ -4,6 +4,14 @@ import it.unibo.common.sdf.SDF
 import kotlin.math.PI
 import kotlin.math.min
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of a shape composed of an arc and a segment
+ * (resembling a question mark or a hook).
+ *
+ * @param center The (X, Y) coordinates of the arc's center.
+ * @param radius The radius of the arc, which also dictates the length and position of the segment.
+ * @property thickness The thickness of the shape (default is 0.0).
+ */
 class Interrogative (
     center: Pair<Double, Double>,
     radius: Double,

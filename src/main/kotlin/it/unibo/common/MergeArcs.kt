@@ -3,11 +3,14 @@ package it.unibo.common
 import kotlin.math.PI
 import kotlin.math.abs
 
+/**
+ * A small constant used as a tolerance threshold for floating-point comparisons.
+ */
 const val EPSILON = 1e-8
 
 /**
  * Given an ordered list [arcs]
- * return a list where al the arcs that were contiguous are united in one single arc
+ * return a list where al the arcs that were contiguous are united in one single arc.
  * */
 fun mergeArcs(arcs: List<Angle>): List<Angle> {
     if (arcs.size <= 1) return arcs

@@ -2,6 +2,13 @@ package it.unibo.common.sdf.impl
 
 import it.unibo.common.sdf.SDF
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of the letter E.
+ *
+ * @param start The (X, Y) coordinates of the starting point (bottom-left) of the vertical stem.
+ * @param height The total height of the letter.
+ * @property thickness The thickness of the letter's strokes (default is 0.0).
+ */
 class LetterE (
     start: Pair<Double, Double>,
     height: Double,

@@ -1,5 +1,8 @@
 package it.unibo.collektive.alchemist.device.sensors
 
+/**
+ * Interface representing a sensor capable of tracking and managing success metrics for a node.
+ */
 interface SuccessSensor {
     /**
      * Set the [success] accumulated at the current node.

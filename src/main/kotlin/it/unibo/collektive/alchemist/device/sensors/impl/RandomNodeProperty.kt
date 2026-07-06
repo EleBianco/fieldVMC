@@ -5,6 +5,13 @@ import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import org.apache.commons.math3.random.RandomGenerator
 
+/**
+ * An Alchemist [NodeProperty] that provides random number generation capabilities to a node.
+ *
+ * @param T The concentration type of the node.
+ * @property node The Alchemist node this property is attached to.
+ * @param randomGenerator The random engine used for generating values.
+ */
 class RandomNodeProperty<T>(
     override val node: Node<T>,
     private val randomGenerator: RandomGenerator,
