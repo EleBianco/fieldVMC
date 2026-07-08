@@ -7,18 +7,13 @@ import it.unibo.collektive.alchemist.device.sensors.LocationSensor
 import it.unibo.collektive.alchemist.device.sensors.RandomGenerator
 import it.unibo.collektive.alchemist.device.sensors.ResourceSensor
 import it.unibo.common.calculateAngle
-import it.unibo.common.findSafeArcs
+import it.unibo.common.findSafeSectors
 import it.unibo.common.minus
 import it.unibo.common.plus
 import java.io.Serializable
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-
-/**
- * A small constant used to handle floating-point approximations.
- */
-const val EPSILON = 1e-9
 
 /**
  * Type alias for a function that spawns devices in an aggregate given some parameters:
@@ -47,7 +42,15 @@ typealias Spawner = Aggregate<Int>.(
 data class Stability(
     val spawnStable: Boolean = false,
     val destroyStable: Boolean = false,
-): Serializable {
+) : Serializable {
+
+    /**
+     * Companion object containing the serialization version UID.
+     */
+    companion object {
+        private const val serialVersionUID: Long = 1L
+    }
+
     /**
      * Combines this stability state with another one using a logical AND.
      *
@@ -82,46 +85,64 @@ fun Aggregate<Int>.determineStability(
     val enoughTime = now > lastChanged + devSpawn.minSpawnWait
     val everyoneIsDestroyStable = now > lastChanged
     val everyoneIsStable = localStability.spawnStable && localStability.destroyStable && enoughTime
+
     env["enough-time"] = enoughTime
     env["everyone-is-stable"] = everyoneIsStable
     env["everyone-is-destroy-stable"] = everyoneIsDestroyStable
+
+    val shouldDestroy = potential > 0.0 &&
+            childrenCount == 0 &&
+            localResource < resourceS.resourceLowerBound &&
+            everyoneIsDestroyStable
+
+    val shouldSpawn = neighborPositions.isEmpty() ||
+            (localResource / (2 + childrenCount) > resourceS.resourceLowerBound &&
+                    childrenCount < devSpawn.maxChildren &&
+                    everyoneIsStable)
+
     return when {
-        potential > 0.0
-            && childrenCount == 0
-            && localResource < resourceS.resourceLowerBound
-            && everyoneIsDestroyStable -> {
+        shouldDestroy -> {
             devSpawn.selfDestroy()
             Stability(spawnStable = false, destroyStable = false)
         }
-        neighborPositions.isEmpty() ||
-            localResource / (2 + childrenCount) > resourceS.resourceLowerBound &&
-            childrenCount < devSpawn.maxChildren &&
-            everyoneIsStable -> {
-            val safeArcs = findSafeArcs(devSpawn.cloningRange) { angle ->
-                val x = devSpawn.cloningRange * cos(angle)
-                val y = devSpawn.cloningRange * sin(angle)
-                safeSpaceChecker(localPosition + (x to y))
-            }
-            val relativePositions = neighborPositions.map { it - localPosition }
-            val angles = relativePositions.map { atan2(it.second, it.first) }.sorted() //in angles ci sono gli angoli a cui si trovano i vicini, non gli angoli validi
-            val angle = calculateAngle(angles, random, devSpawn.maxChildren, safeArcs)
-            when {
-                angle.isNaN() -> Stability(spawnStable = true, destroyStable = true)
-                else -> {
-                    val x = devSpawn.cloningRange * cos(angle)
-                    val y = devSpawn.cloningRange * sin(angle)
-                    val absoluteDestination = localPosition + (x to y)
+        shouldSpawn -> executeSpawnLogic(
+            devSpawn,
+            localPosition,
+            neighborPositions,
+            random,
+            localStability,
+            safeSpaceChecker
+        )
+        else -> Stability(spawnStable = enoughTime, destroyStable = everyoneIsDestroyStable)
+    }
+}
 
-                    val control = safeSpaceChecker(absoluteDestination)
-                    if(control < -EPSILON){
-                        println("Spown non valido!"+ localId + control)
-                    }
+private fun Aggregate<Int>.executeSpawnLogic(
+    devSpawn: DeviceSpawn,
+    localPosition: Pair<Double, Double>,
+    neighborPositions: List<Pair<Double, Double>>,
+    random: RandomGenerator,
+    localStability: Stability,
+    safeSpaceChecker: (Pair<Double, Double>) -> Double
+): Stability {
+    val safeSectors = findSafeSectors(devSpawn.cloningRange) { angle ->
+        val x = devSpawn.cloningRange * cos(angle)
+        val y = devSpawn.cloningRange * sin(angle)
+        safeSpaceChecker(localPosition + (x to y))
+    }
+    val relativePositions = neighborPositions.map { it - localPosition }
+    val angles = relativePositions.map { atan2(it.second, it.first) }.sorted()
+    val angle = calculateAngle(angles, random, devSpawn.maxChildren, safeSectors)
 
-                    devSpawn.spawn(absoluteDestination)
-                    Stability(spawnStable = false, destroyStable = localStability.destroyStable)
-                }
-            }
+    return when {
+        angle.isNaN() -> Stability(spawnStable = true, destroyStable = true)
+        else -> {
+            val x = devSpawn.cloningRange * cos(angle)
+            val y = devSpawn.cloningRange * sin(angle)
+            val absoluteDestination = localPosition + (x to y)
+
+            devSpawn.spawn(absoluteDestination)
+            Stability(spawnStable = false, destroyStable = localStability.destroyStable)
         }
-        else -> Stability(spawnStable = enoughTime, destroyStable = now > lastChanged)
     }
 }

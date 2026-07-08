@@ -10,7 +10,7 @@ import it.unibo.common.NetworkMetrics.networkDensity
 /**
  * An Alchemist [Extractor] that computes and exports the network density of the simulated environment.
  */
-class NetworkDensity() : Extractor<Double> {
+class NetworkDensity : Extractor<Double> {
     private companion object {
         private const val NAME: String = "network-density"
     }

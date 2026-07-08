@@ -183,18 +183,10 @@ object Environments {
      */
     fun Environment<*, *>.networkDiameter(): Double = allSubNetworks().singleOrNull()?.diameter ?: NaN
 
-    private data class SubNetwork<T>(override val diameter: Double, override val nodes: Set<Node<T>>) : Network<T> {
-        init {
-            require(nodes.isNotEmpty())
-            require(diameter.isFinite() && diameter >= 0.0)
-        }
-
-        constructor(diameter: Double, vararg nodes: Node<T>) : this(diameter, nodes.toSet())
-
-        constructor(diameter: Double, nodes: Collection<Node<T>>) : this(diameter, nodes.toSet())
-    }
-
-    private data class MutableNetwork<T>(override var diameter: Double, val neighbors: MutableList<Node<T>>) : Network<T> {
+    private data class MutableNetwork<T>(
+        override var diameter: Double,
+        val neighbors: MutableList<Node<T>>
+    ) : Network<T> {
         override val nodes: Set<Node<T>> by lazy { neighbors.toSet() }
     }
 }

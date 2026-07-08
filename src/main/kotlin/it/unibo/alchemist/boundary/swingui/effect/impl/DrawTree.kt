@@ -75,7 +75,7 @@ class DrawTree : Effect {
         }.onSuccess { neighborhood ->
             val localPosition = environment.getPosition(node)
             val viewPoint: Point = wormhole.getViewPoint(localPosition)
-            val shifted: P = environment.makePosition(0.3, 0.3) + localPosition.coordinates
+            val shifted: P = environment.makePosition(SHIFT_OFFSET, SHIFT_OFFSET) + localPosition.coordinates
             val shiftedViewPoint = wormhole.getViewPoint(shifted)
             val lineDistance = abs(shiftedViewPoint.x - viewPoint.x)
             for (neighbor in neighborhood) {
@@ -84,8 +84,12 @@ class DrawTree : Effect {
                     if (neighbor.id == parentId) {
                         val (midpoint1, midpoint2) = midpointShift(viewPoint, screenNeighborPosition, lineDistance)
                         g.stroke =
-                            BasicStroke(lineDistance * (localSuccess / maxSuccess).toFloat(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
-                        g.color = Color(234, 109, 0)
+                            BasicStroke(
+                                lineDistance * (localSuccess / maxSuccess).toFloat(),
+                                BasicStroke.CAP_BUTT,
+                                BasicStroke.JOIN_MITER
+                            )
+                        g.color = SUCCESS_COLOR
 
                         fun drawLine(
                             p1: Point,
@@ -100,7 +104,7 @@ class DrawTree : Effect {
                                 BasicStroke.CAP_BUTT,
                                 BasicStroke.JOIN_MITER,
                             )
-                        g.color = Color(85, 170, 0)
+                        g.color = RESOURCE_COLOR
                         drawLine(viewPoint, midpoint2)
                         drawLine(midpoint2, screenNeighborPosition)
                         //                g.drawString("%.2f".format(localResource), midpoint2.x, midpoint2.y)
@@ -108,8 +112,14 @@ class DrawTree : Effect {
                     g.color = Color.BLACK
                     g.stroke =
                         when {
-                            neighbor.id == parentId -> BasicStroke(4f)
-                            else -> BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, dashPattern, 0f)
+                            neighbor.id == parentId -> BasicStroke(PARENT_STROKE_WIDTH)
+                            else -> BasicStroke(
+                                NON_PARENT_STROKE_WIDTH,
+                                BasicStroke.CAP_BUTT,
+                                BasicStroke.JOIN_MITER,
+                                DASH_MITER_LIMIT, dashPattern,
+                                DASH_PHASE
+                            )
                         }
                     g.drawLine(viewPoint.x, viewPoint.y, screenNeighborPosition.x, screenNeighborPosition.y)
                 }
@@ -121,6 +131,14 @@ class DrawTree : Effect {
      * Utility functions and constants for geometric tree rendering.
      */
     companion object {
+
+        private const val SHIFT_OFFSET = 0.3
+        private const val PARENT_STROKE_WIDTH = 4f
+        private const val NON_PARENT_STROKE_WIDTH = 1.5f
+        private const val DASH_MITER_LIMIT = 10f
+        private const val DASH_PHASE = 0f
+        private val SUCCESS_COLOR = Color(234, 109, 0)
+        private val RESOURCE_COLOR = Color(85, 170, 0)
 
         /**
          * Molecule used to identify the parent of a node.
@@ -135,7 +153,7 @@ class DrawTree : Effect {
         /**
          * Minimum arc distance for rendering.
          */
-        val minArcDistance = 10
+        const val minArcDistance = 10
 
         private fun Any?.toInt(): Int? =
             when (this) {
@@ -287,9 +305,12 @@ data class Circle(
     val radius: Double,
 )
 
+private const val TEST_POINT_Y = 10
+private const val TEST_DISTANCE = 15
+
 /**
  * Test function.
  */
 fun main() {
-    println(circlesThrough(Point(0, 0), Point(0, 10), 15))
+    println(circlesThrough(Point(0, 0), Point(0, TEST_POINT_Y), TEST_DISTANCE))
 }

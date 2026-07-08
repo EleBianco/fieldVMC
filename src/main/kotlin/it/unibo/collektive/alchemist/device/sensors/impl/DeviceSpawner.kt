@@ -24,37 +24,47 @@ import kotlin.math.nextUp
  * @property minSpawnWait The minimum amount of time to wait before a new spawn is allowed.
  */
 class DeviceSpawner<T, P : Position<P>>
-    @JvmOverloads
-    constructor(
-        private val randomGenerator: RandomGenerator,
-        private val environment: Environment<T, P>,
-        override val node: Node<T>,
-        override val cloningRange: Double = 1.0,
-        override val maxChildren: Int,
-        override val minSpawnWait: Double = 20.0,
-    ) : DeviceSpawn,
-        NodeProperty<T> {
-        override fun cloneOnNewNode(node: Node<T>): NodeProperty<T> =
-            DeviceSpawner(randomGenerator, environment, node, cloningRange, maxChildren, minSpawnWait)
+@JvmOverloads
+constructor(
+    private val randomGenerator: RandomGenerator,
+    private val environment: Environment<T, P>,
+    override val node: Node<T>,
+    override val cloningRange: Double = 1.0,
+    override val maxChildren: Int,
+    override val minSpawnWait: Double = 20.0,
+) : DeviceSpawn,
+    NodeProperty<T> {
+    override fun cloneOnNewNode(node: Node<T>): NodeProperty<T> =
+        DeviceSpawner(randomGenerator, environment, node, cloningRange, maxChildren, minSpawnWait)
 
-        @Suppress("UNCHECKED_CAST")
-        override fun spawn(coordinate: Pair<Double, Double>): Double {
-            val spawningTime =
-                environment.simulation.time + DoubleTime(randomGenerator.nextDouble(0.0.nextUp(), 0.1))
-            val cloneOfThis = node.cloneNode(spawningTime)
-            cloneOfThis.setConcentration(SimpleMolecule("leader"), false as T)
-            val updatedPosition = environment.makePosition(*coordinate.toList().toTypedArray())
-            environment.addNode(cloneOfThis, updatedPosition)
-            return spawningTime.toDouble()
-        }
-
-        override fun selfDestroy() {
-            node.reactions.toList().forEach {
-                environment.simulation.reactionRemoved(it)
-                node.removeReaction(it)
-            }
-            environment.simulation.schedule { environment.removeNode(node) }
-        }
-
-        override fun currentTime(): Double = environment.simulation.time.toDouble()
+    @Suppress("UNCHECKED_CAST")
+    override fun spawn(coordinate: Pair<Double, Double>): Double {
+        val spawningTime =
+            environment.simulation.time + DoubleTime(randomGenerator.nextDouble(0.0.nextUp(), MAX_SPAWN_JITTER))
+        val cloneOfThis = node.cloneNode(spawningTime)
+        cloneOfThis.setConcentration(SimpleMolecule("leader"), false as T)
+        val updatedPosition = environment.makePosition(*coordinate.toList().toTypedArray())
+        environment.addNode(cloneOfThis, updatedPosition)
+        return spawningTime.toDouble()
     }
+
+    override fun selfDestroy() {
+        node.reactions.toList().forEach {
+            environment.simulation.reactionRemoved(it)
+            node.removeReaction(it)
+        }
+        environment.simulation.schedule { environment.removeNode(node) }
+    }
+
+    override fun currentTime(): Double = environment.simulation.time.toDouble()
+
+    /**
+     * Constants for the [DeviceSpawner] property.
+     */
+    companion object {
+        /**
+         * Maximum time jitter added to a node's spawn time.
+         */
+        private const val MAX_SPAWN_JITTER = 0.1
+    }
+}

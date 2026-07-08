@@ -23,9 +23,9 @@ class Star (
     private val center: Pair<Double, Double>,
     private val radius: Double,
     private val n: Int,
-    m: Double = n / 2.0, //m determines how much the angles between the points are profound
-    private val isRing: Boolean = false, //if true, the space is a ring shaped like a star
-    private val thickness: Double = 0.0, //thickness of the ring, or used to make round corners
+    m: Double = n / 2.0,
+    private val isRing: Boolean = false,
+    private val thickness: Double = 0.0,
 ) : SDF {
 
     private val an = PI / n.toDouble()

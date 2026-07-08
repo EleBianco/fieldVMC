@@ -13,13 +13,27 @@ class LetterE (
     start: Pair<Double, Double>,
     height: Double,
     private val thickness: Double = 0.0,
-) : SDF{
+) : SDF {
     private val vertical = Segment(start, Pair(start.first, start.second + height))
-    private val horizontalLow = Segment(start, Pair(start.first + height / 2.0, start.second))
-    private val horizontalCenter = Segment(Pair(start.first, start.second + height / 2.0), Pair(start.first + height * 3.0 / 8.0, start.second + height / 2.0))
-    private val horizontalHigh = Segment(Pair(start.first, start.second + height), Pair(start.first + height / 2.0, start.second + height))
+    private val horizontalLow = Segment(start, Pair(start.first + height / HALF_DIVISOR, start.second))
+    private val horizontalCenter = Segment(
+        Pair(start.first, start.second + height / HALF_DIVISOR),
+        Pair(start.first + height * THREE_EIGHTHS, start.second + height / HALF_DIVISOR)
+    )
+    private val horizontalHigh = Segment(
+        Pair(start.first, start.second + height),
+        Pair(start.first + height / HALF_DIVISOR, start.second + height)
+    )
 
     override fun invoke(p: Pair<Double, Double>): Double {
         return minOf(vertical(p), horizontalLow(p), horizontalCenter(p), horizontalHigh(p)) - thickness
+    }
+
+    /**
+     * Constants used for proportional geometry calculations.
+     */
+    companion object {
+        private const val HALF_DIVISOR = 2.0
+        private const val THREE_EIGHTHS = 0.375
     }
 }

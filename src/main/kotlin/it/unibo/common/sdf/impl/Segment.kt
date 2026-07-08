@@ -3,6 +3,13 @@ package it.unibo.common.sdf.impl
 import it.unibo.common.sdf.SDF
 import it.unibo.common.pointsDistance
 
+/**
+ * Represents a 2D Signed Distance Field (SDF) of a line segment.
+ *
+ * @property a The (X, Y) coordinates of the starting point of the segment.
+ * @property b The (X, Y) coordinates of the ending point of the segment.
+ * @property thickness The thickness of the segment (default is 0.0).
+ */
 class Segment (
     private val a: Pair<Double, Double>,
     private val b: Pair<Double, Double>,

@@ -55,30 +55,19 @@ fun findZeros(r: Double, validator: (Double) -> Double): List<Double> {
         d = abs(d)
 
         if (d > 2 * r) {
-            return zeros //che dovrebbe sempre essere empty se SDF e calcoli sono definiti bene!
+            return zeros
 
         } else {
 
-            if (d == 0.0) { //vogliamo 0 o ci basta che sia < di un tot?
+            if (d == 0.0) {
                 zeros.add(angle)
             }
-
-            //ci spostiamo esattamente di delta?
-            //con approssimazioni di calcolo o SDF non del tutto precisi (smooth min) d potrebbe non essere perfetta
-            // => ora ho messo IMPRECISION e ci spostiamo proporzionale a MIN invece che di un valore fisso
-
             val delta = if( d < MIN ) 2 * asin(MIN / (2 * r)) else 2 * asin((d) / (2 * r))
             angle += delta
         }
 
     }
 
-    //serve un controllo di wrap around?
-    //in teoria no perchè se anche con d ridotta abbiamo superato 2PI significa che lo
-    // zero era oltre 0.0 e lo abbiamo già trovato?!
-    // e se ci siamo mossi di min?
-
-    //wrap around (per ora per sicurezza)
     val dFirst = validator(0.0)
     if (prevd != 0.0 && dFirst != 0.0 && sign(dFirst) != sign(prevd)) {
         zeros.add(bisection(2 * PI, prev, validator))
@@ -108,20 +97,20 @@ fun bisection(first: Double, second: Double, validator: (Double) -> Double): Dou
 
     var pos = if (vFirst > 0.0) first else second
     var neg = if (vFirst < 0.0) first else second
-    var temp: Double
+    var candidate: Double
 
     do {
-        temp = (pos + neg) / 2.0
-        val d = validator(temp)
+        candidate = (pos + neg) / 2.0
+        val d = validator(candidate)
 
         if (d < 0.0) {
-            neg = temp
+            neg = candidate
         } else if (d > 0.0) {
-            pos = temp
+            pos = candidate
         } else {
-            return temp
+            return candidate
         }
     } while (abs(pos - neg) > TOLERANCE)
 
-    return temp
+    return candidate
 }

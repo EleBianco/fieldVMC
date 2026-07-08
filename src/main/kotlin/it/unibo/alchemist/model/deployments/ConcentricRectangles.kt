@@ -55,7 +55,8 @@ class ConcentricRectangles<P: Position<P>>(
          * The total area of the rectangle.
          */
         val area = width * height
-        override fun toString(): String = "Rectangle(start($startX, $startY), finish(${startX + width}, ${startY + height})), " +
+        override fun toString(): String =
+            "Rectangle(start($startX, $startY), finish(${startX + width}, ${startY + height})), " +
                 "width: $width, height: $height, area: $area"
     }
 
