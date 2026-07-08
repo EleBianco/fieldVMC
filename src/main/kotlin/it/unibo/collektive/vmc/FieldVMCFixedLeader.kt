@@ -52,14 +52,7 @@ fun Aggregate<Int>.fixedRootStability(
             resourceS,
             successS,
         ) { devSpawn, locationS, potential: Double, localSuccess: Double, success: Double, localResource: Double ->
-            val children = neighboring(findParent(potential))
-            env["children-around"] = children
-            env["parent"] = children.local.value
-            val childrenCount = children.neighbors.countMatching { it.value == localId }
-            env["children-count"] = childrenCount
-            val neighbors = neighboring(locationS.coordinates())
-            val localPosition = neighbors.local.value
-            val neighborPositions = locationS.surroundings()
+            val (childrenCount, localPosition, neighborPositions) = extractNeighborhood(potential, env, locationS)
             determineSpawn(childrenCount, localResource, localPosition, neighborPositions, devSpawn, random, resourceS)
         }
     }

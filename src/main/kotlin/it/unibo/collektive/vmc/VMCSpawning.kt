@@ -66,14 +66,7 @@ fun Aggregate<Int>.spawnAndDestroyAfterStability(
             resourceS,
             successS,
         ) { devSpawn, locationSensor, potential: Double, localSuccess: Double, success: Double, localResource: Double ->
-            val children = neighboring(findParent(potential))
-            env["children-around"] = children
-            env["parent"] = children.local.value
-            val childrenCount = children.neighbors.countMatching { it.value == localId}
-            env["children-count"] = childrenCount
-            val neighbors = neighboring(locationSensor.coordinates())
-            val localPosition = neighbors.local.value
-            val neighborPositions = locationSensor.surroundings()
+            val (childrenCount, localPosition, neighborPositions) = extractNeighborhood(potential, env, locationSensor)
             val now = devSpawn.currentTime()
             share(Stability()) { neighborhoodStability ->
                 val lastChanged =
