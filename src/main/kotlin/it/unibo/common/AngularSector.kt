@@ -13,7 +13,8 @@ data class AngularSector(
     /**
      * Compares this angle with another based on the arc length first, then the starting angle.
      */
-    override fun compareTo(other: AngularSector): Int = compareBy(AngularSector::arc)
+    override fun compareTo(other: AngularSector): Int =
+        compareBy(AngularSector::arc)
         .thenBy(AngularSector::from)
         .compare(this, other)
 }

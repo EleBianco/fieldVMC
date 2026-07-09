@@ -42,12 +42,13 @@ fun wrapSectors(sectors: List<AngularSector>): List<AngularSector> {
     val first = sectors.first()
     val last = sectors.last()
 
-    return if(abs(last.from + last.arc - (first.from + 2 * PI)) < EPSILON) {
+    return if (abs(last.from + last.arc - (first.from + 2 * PI)) < EPSILON) {
         val combinedArc = last.arc + first.arc
         val merged = AngularSector(last.from, combinedArc)
         val middleArcs = sectors.drop(1).dropLast(1)
 
         middleArcs + merged
+    } else {
+        sectors
     }
-    else sectors
 }

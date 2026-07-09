@@ -42,7 +42,8 @@ fun calculateAngle(
 
     val minArc = 2 * PI / maxChildren
 
-    val differences = when {
+    val differences =
+        when {
         angles.isEmpty() -> listOf(AngularSector(0.0, 2 * PI))
         angles.size == 1 -> listOf(AngularSector(angles.first(), 2 * PI))
         else -> {
@@ -83,7 +84,6 @@ fun calculateAngle(
             val selected = validIntersections.randomElementWeighted(random) { arc }
             relativeAngleTowards(selected.arc / 2 + selected.from)
                 .coerceIn(selected.from, selected.from + selected.arc)
-
         }
     }
 }
@@ -93,14 +93,13 @@ fun calculateAngle(
  * If the arc passes the 0, it is split in two normalized arcs
  */
 fun splitAtZero(sector: AngularSector): List<AngularSector> {
-
     val start = ((sector.from % (2 * PI)) + 2 * PI) % (2 * PI)
     val end = start + sector.arc
 
     return if (end > 2 * PI) {
         listOf(
             AngularSector(start, 2 * PI - start),
-            AngularSector(0.0, end - 2 * PI)
+            AngularSector(0.0, end - 2 * PI),
         )
     } else {
         listOf(AngularSector(start, sector.arc))

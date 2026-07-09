@@ -11,7 +11,6 @@ import it.unibo.common.NetworkMetrics.nodesDegree
  * from a given simulation environment.
  */
 class TerminationMetrics : (Environment<*, *>) -> Map<String, Double> {
-
     /**
      * Evaluates the environment and extracts a map of network metrics.
      *

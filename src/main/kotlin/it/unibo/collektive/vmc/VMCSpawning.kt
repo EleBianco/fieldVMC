@@ -18,9 +18,6 @@ import it.unibo.collektive.lib.spreadResource
 import it.unibo.collektive.utils.Spawner
 import it.unibo.collektive.utils.Stability
 import it.unibo.collektive.utils.determineStability
-import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.accumulation.findParent
-import it.unibo.collektive.stdlib.collapse.countMatching
 import it.unibo.collektive.alchemist.device.properties.CBF
 
 /**

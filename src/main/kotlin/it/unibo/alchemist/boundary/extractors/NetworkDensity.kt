@@ -6,7 +6,6 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Time
 import it.unibo.common.NetworkMetrics.networkDensity
 
-
 /**
  * An Alchemist [Extractor] that computes and exports the network density of the simulated environment.
  */

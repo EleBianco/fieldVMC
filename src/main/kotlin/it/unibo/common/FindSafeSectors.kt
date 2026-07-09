@@ -8,16 +8,20 @@ import kotlin.math.PI
  * The safe region is determined along a circumference of radius [r] using the provided [validator]
  * function, which computes the distance from a specific point (given its angle) to the boundary.
  */
-fun findSafeSectors(r: Double, validator: (Double) -> Double): List<AngularSector>{
+fun findSafeSectors(
+    r: Double,
+    validator: (Double) -> Double,
+): List<AngularSector> {
     val zeros = findZeros(r, validator).sorted()
 
-    if (zeros.isEmpty()){
+    if (zeros.isEmpty()) {
         val fullCircle = AngularSector(0.0, 2 * PI)
         return if (isSectorSafe(fullCircle, validator)) listOf(fullCircle) else emptyList()
     }
 
     val wrappedZeros = zeros + (zeros.first() + 2 * PI)
-    val safeSectors = wrappedZeros
+    val safeSectors =
+        wrappedZeros
         .zipWithNext { a, b -> AngularSector(a, b - a) }
         .filter { isSectorSafe(it, validator) }
 
@@ -36,7 +40,10 @@ fun findSafeSectors(r: Double, validator: (Double) -> Double): List<AngularSecto
  * If all tested points evaluate to `0.0`, the arc is assumed to perfectly overlap the boundary
  * and is considered safe.
  */
-fun isSectorSafe(sector: AngularSector, validator: (Double) -> Double): Boolean {
+fun isSectorSafe(
+    sector: AngularSector,
+    validator: (Double) -> Double,
+): Boolean {
     val maxDepth = 10
     var divisor = 2.0
     var isSafe = true

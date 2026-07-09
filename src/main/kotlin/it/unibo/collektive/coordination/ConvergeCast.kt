@@ -1,20 +1,20 @@
 package it.unibo.collektive.coordination
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.exchanging
+import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.accumulation.convergeCast
 import it.unibo.collektive.stdlib.accumulation.findParent
 
 @PublishedApi
-internal inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findDisambiguatedParent(
+internal inline fun <reified ID : Comparable<ID>> Aggregate<ID>.findDisambiguatedParent(
     potential: Double,
     crossinline disambiguateParent: (ID, ID) -> ID,
-): ID = findParent(
+): ID =
+    findParent(
         potential,
         { (id1, _), (id2, _) ->
             when (disambiguateParent(id1, id2)) {
@@ -22,7 +22,7 @@ internal inline fun <reified ID: Comparable<ID>> Aggregate<ID>.findDisambiguated
                 id2 -> 1
                 else -> error("Impossible to disambiguate parent $id2 and $id1")
             }
-        }
+        },
     )
 
 /**
@@ -47,7 +47,7 @@ inline fun <reified T, reified ID> Aggregate<ID>.convergeCast(
                 else -> error("Impossible to disambiguate parent $id2 and $id1")
             }
         },
-        accumulateData = reduce
+        accumulateData = reduce,
     )
 
 
@@ -75,7 +75,7 @@ inline fun <reified ID> Aggregate<ID>.spreadToChildren(
         val neighborParents = neighboring(parent) // Each device is mapped to its parent
         val childrenSuccess: Field<ID, Double> =
             neighborParents
-                .alignedMap(neighboring(localSuccess)) {_, itsParent, itsSuccess ->
+                .alignedMap(neighboring(localSuccess)) { _, itsParent, itsSuccess ->
                     when {
                         itsParent == localId -> itsSuccess
                         else -> 0.0

@@ -19,7 +19,7 @@ import kotlin.math.sqrt
  * @property isRing True if the space is a ring shaped like a star instead of a solid star (default is false).
  * @property thickness The thickness of the ring, or used to make round corners (default is 0.0).
  */
-class Star (
+class Star(
     private val center: Pair<Double, Double>,
     private val radius: Double,
     private val n: Int,
@@ -27,7 +27,6 @@ class Star (
     private val isRing: Boolean = false,
     private val thickness: Double = 0.0,
 ) : SDF {
-
     private val an = PI / n.toDouble()
     private val en = PI / m
 
@@ -61,6 +60,6 @@ class Star (
         py += ecsY * clamped
 
         val distance = sqrt(px * px + py * py) * sign(px)
-        return if(isRing) abs( distance) - thickness else distance - thickness
+        return if (isRing) abs(distance) - thickness else distance - thickness
     }
 }

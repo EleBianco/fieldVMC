@@ -1,7 +1,7 @@
 package it.unibo.common.sdf.impl
 
-import it.unibo.common.sdf.SDF
 import it.unibo.common.pointsDistance
+import it.unibo.common.sdf.SDF
 import kotlin.math.abs
 
 /**
